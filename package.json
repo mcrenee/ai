@@ -1,0 +1,17 @@
+{
+  "name": "webapp",
+  "version": "1.0.0",
+  "description": "AI 现金流投资全自动推演平台",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx http-server public -p 3000",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "wrangler pages deploy public --project-name webapp",
+    "git:init": "git init && git add . && git commit -m 'Initial commit'",
+    "git:commit": "git add . && git commit -m",
+    "git:status": "git status"
+  },
+  "keywords": ["investment", "cash-flow", "simulation", "AI"],
+  "author": "",
+  "license": "ISC"
+}
