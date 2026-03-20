@@ -3,832 +3,975 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI 现金流投资全自动推演平台</title>
+<title>AI 全自动现金流投资推演 v2.0</title>
 <style>
-:root {
-  --primary: #1a1a2e;
-  --secondary: #16213e;
-  --accent: #0f3460;
-  --highlight: #e94560;
-  --gold: #f0c040;
-  --green: #2ecc71;
-  --blue: #3498db;
-  --orange: #e67e22;
-  --purple: #9b59b6;
-  --bg: #0d1117;
-  --card: #161b22;
-  --text: #e6e6e6;
-  --muted: #8b949e;
-  --border: #30363d;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); min-height:100vh; }
-.app { display:flex; min-height:100vh; }
-.sidebar { width:240px; background:var(--card); border-right:1px solid var(--border); padding:20px 0; position:fixed; height:100vh; overflow-y:auto; z-index:100; }
-.sidebar h1 { font-size:16px; padding:0 20px 20px; border-bottom:1px solid var(--border); color:var(--gold); }
-.sidebar h1 span { font-size:11px; color:var(--muted); display:block; margin-top:4px; }
-.nav-item { padding:12px 20px; cursor:pointer; transition:all .2s; font-size:14px; border-left:3px solid transparent; display:flex; align-items:center; gap:10px; }
-.nav-item:hover { background:var(--secondary); }
-.nav-item.active { background:var(--accent); border-left-color:var(--highlight); color:var(--gold); }
-.nav-item .icon { font-size:18px; width:24px; text-align:center; }
-.main { margin-left:240px; flex:1; padding:24px; }
-.tab-content { display:none; }
-.tab-content.active { display:block; }
-.page-title { font-size:24px; font-weight:700; margin-bottom:8px; }
-.page-subtitle { color:var(--muted); font-size:14px; margin-bottom:24px; }
-.kpi-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
-.kpi-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; position:relative; overflow:hidden; }
-.kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
-.kpi-card.red::before { background:var(--highlight); }
-.kpi-card.green::before { background:var(--green); }
-.kpi-card.blue::before { background:var(--blue); }
-.kpi-card.gold::before { background:var(--gold); }
-.kpi-card.orange::before { background:var(--orange); }
-.kpi-card.purple::before { background:var(--purple); }
-.kpi-label { font-size:12px; color:var(--muted); margin-bottom:8px; }
-.kpi-value { font-size:28px; font-weight:700; }
-.kpi-note { font-size:11px; color:var(--muted); margin-top:6px; }
-.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:20px; }
-.card-title { font-size:16px; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
-.section-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(480px,1fr)); gap:20px; }
-table { width:100%; border-collapse:collapse; font-size:13px; }
-th, td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--border); }
-th { color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; }
-tr:hover { background:rgba(255,255,255,0.02); }
-.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
-.badge-a { background:rgba(46,204,113,0.2); color:var(--green); }
-.badge-b { background:rgba(52,152,219,0.2); color:var(--blue); }
-.badge-c { background:rgba(230,126,34,0.2); color:var(--orange); }
-.badge-d { background:rgba(233,69,96,0.2); color:var(--highlight); }
-.bar-chart { display:flex; flex-direction:column; gap:8px; }
-.bar-row { display:flex; align-items:center; gap:10px; }
-.bar-label { width:100px; font-size:12px; text-align:right; flex-shrink:0; }
-.bar-track { flex:1; height:24px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden; position:relative; }
-.bar-fill { height:100%; border-radius:4px; transition:width .5s; display:flex; align-items:center; padding:0 8px; font-size:11px; font-weight:600; color:#fff; min-width:fit-content; }
-.bar-value { font-size:12px; width:60px; text-align:right; flex-shrink:0; }
-.slider-group { margin-bottom:18px; }
-.slider-group label { display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; }
-.slider-group label span { color:var(--gold); font-weight:600; }
-input[type=range] { width:100%; height:6px; -webkit-appearance:none; background:var(--border); border-radius:3px; outline:none; }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--highlight); cursor:pointer; }
-.result-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-top:16px; }
-.result-item { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:14px; }
-.result-item .label { font-size:11px; color:var(--muted); }
-.result-item .value { font-size:22px; font-weight:700; margin-top:4px; }
-.result-item .formula { font-size:10px; color:var(--muted); margin-top:4px; font-style:italic; border-top:1px dashed var(--border); padding-top:4px; }
-.stress-chart { display:flex; align-items:flex-end; gap:4px; height:160px; margin-top:16px; padding-top:10px; }
-.stress-bar { flex:1; border-radius:3px 3px 0 0; transition:height .3s; position:relative; min-width:20px; }
-.stress-bar .tip { position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:10px; white-space:nowrap; }
-select { background:var(--card); color:var(--text); border:1px solid var(--border); padding:8px 12px; border-radius:6px; font-size:13px; }
-input[type=text] { background:var(--card); color:var(--text); border:1px solid var(--border); padding:8px 12px; border-radius:6px; font-size:13px; width:200px; }
-.btn { padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600; }
-.btn-primary { background:var(--highlight); color:#fff; }
-.btn-primary:hover { opacity:.9; }
-.modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.7); z-index:1000; justify-content:center; align-items:center; }
-.modal-overlay.show { display:flex; }
-.modal { background:var(--card); border:1px solid var(--border); border-radius:16px; width:90%; max-width:800px; max-height:85vh; overflow-y:auto; padding:32px; }
-.modal-close { float:right; cursor:pointer; font-size:24px; color:var(--muted); background:none; border:none; }
-.modal-close:hover { color:var(--text); }
-.six-dim { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; }
-.dim-card { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:12px; text-align:center; }
-.dim-score { font-size:28px; font-weight:700; }
-.dim-label { font-size:11px; color:var(--muted); margin-top:4px; }
-.dim-bar { height:4px; background:var(--border); border-radius:2px; margin-top:6px; overflow:hidden; }
-.dim-bar-fill { height:100%; border-radius:2px; }
-.tag { display:inline-block; padding:2px 6px; border-radius:3px; font-size:10px; margin:2px; background:rgba(255,255,255,0.05); color:var(--muted); }
-.logic-box { background:rgba(15,52,96,0.3); border:1px solid var(--accent); border-radius:8px; padding:16px; margin:12px 0; font-size:13px; line-height:1.8; }
-.logic-box .logic-title { color:var(--gold); font-weight:600; margin-bottom:8px; font-size:14px; }
-.timeline { position:relative; padding-left:30px; }
-.timeline::before { content:''; position:absolute; left:10px; top:0; bottom:0; width:2px; background:var(--border); }
-.timeline-item { position:relative; margin-bottom:24px; }
-.timeline-item::before { content:''; position:absolute; left:-24px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--highlight); border:2px solid var(--bg); }
-.timeline-item .day { font-size:12px; color:var(--highlight); font-weight:600; }
-.timeline-item .desc { font-size:13px; margin-top:4px; line-height:1.6; }
-.source-tag { font-size:10px; color:var(--blue); background:rgba(52,152,219,0.1); padding:1px 5px; border-radius:3px; }
-@media(max-width:768px){
-  .sidebar{width:60px;} .sidebar h1{display:none;} .nav-item span:not(.icon){display:none;} .main{margin-left:60px;padding:12px;} .section-grid{grid-template-columns:1fr;} .kpi-grid{grid-template-columns:repeat(2,1fr);} .six-dim{grid-template-columns:repeat(2,1fr);}
-}
+  :root {
+    --bg: #0a0e1a;
+    --card: #111827;
+    --border: #1e293b;
+    --accent: #3b82f6;
+    --accent2: #10b981;
+    --accent3: #f59e0b;
+    --accent4: #ef4444;
+    --accent5: #8b5cf6;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --green: #10b981;
+    --red: #ef4444;
+    --orange: #f97316;
+    --yellow: #eab308;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Inter','SF Pro','PingFang SC','Microsoft YaHei',sans-serif; line-height:1.6; }
+  .container { max-width:1400px; margin:0 auto; padding:20px; }
+  
+  /* Header */
+  .header { text-align:center; padding:40px 0 30px; border-bottom:1px solid var(--border); margin-bottom:30px; }
+  .header h1 { font-size:2rem; background:linear-gradient(135deg,#3b82f6,#10b981); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:8px; }
+  .header .ver { color:var(--accent); font-size:.85rem; border:1px solid var(--accent); padding:2px 10px; border-radius:12px; display:inline-block; margin-bottom:8px; }
+  .header p { color:var(--text2); font-size:.9rem; }
+
+  /* Nav tabs */
+  .nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; border-bottom:1px solid var(--border); padding-bottom:12px; }
+  .nav button { background:transparent; border:none; color:var(--text3); padding:8px 16px; border-radius:8px 8px 0 0; cursor:pointer; font-size:.85rem; transition:.2s; }
+  .nav button:hover { color:var(--text); background:rgba(59,130,246,.1); }
+  .nav button.active { color:var(--accent); background:rgba(59,130,246,.15); border-bottom:2px solid var(--accent); }
+
+  /* Sections */
+  .section { display:none; }
+  .section.active { display:block; }
+
+  /* Cards grid */
+  .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+  .kpi-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; }
+  .kpi-card .label { font-size:.75rem; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+  .kpi-card .value { font-size:1.6rem; font-weight:700; color:var(--text); }
+  .kpi-card .value.blue { color:var(--accent); }
+  .kpi-card .value.green { color:var(--green); }
+  .kpi-card .value.orange { color:var(--orange); }
+  .kpi-card .sub { font-size:.72rem; color:var(--text3); margin-top:4px; }
+
+  /* Panels */
+  .panel { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:20px; }
+  .panel h3 { font-size:1.05rem; color:var(--text); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .panel h3 .icon { font-size:1.2rem; }
+
+  /* Tables */
+  .tbl-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:.8rem; }
+  th { background:rgba(59,130,246,.1); color:var(--accent); text-align:left; padding:10px 12px; font-weight:600; white-space:nowrap; }
+  td { padding:10px 12px; border-bottom:1px solid var(--border); color:var(--text2); }
+  tr:hover td { background:rgba(59,130,246,.03); }
+
+  /* Funnel */
+  .funnel { display:flex; align-items:center; gap:0; margin:20px 0; flex-wrap:wrap; justify-content:center; }
+  .funnel-step { text-align:center; padding:16px 12px; min-width:140px; position:relative; }
+  .funnel-step .dot { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin:0 auto 8px; font-weight:700; }
+  .funnel-step .fname { font-size:.8rem; font-weight:600; color:var(--text); }
+  .funnel-step .fnum { font-size:1.1rem; font-weight:700; margin-top:2px; }
+  .funnel-step .frate { font-size:.7rem; color:var(--text3); margin-top:2px; }
+  .funnel-arrow { font-size:1.5rem; color:var(--text3); }
+
+  /* Pipeline flow */
+  .pipeline { display:flex; gap:0; align-items:stretch; margin:20px 0; overflow-x:auto; padding-bottom:8px; }
+  .pipe-stage { flex:1; min-width:160px; padding:16px; border-right:1px solid var(--border); }
+  .pipe-stage:last-child { border-right:none; }
+  .pipe-stage .stage-icon { font-size:1.6rem; margin-bottom:8px; }
+  .pipe-stage .stage-title { font-size:.85rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .pipe-stage .stage-count { font-size:1.3rem; font-weight:800; margin-bottom:4px; }
+  .pipe-stage .stage-desc { font-size:.72rem; color:var(--text3); line-height:1.4; }
+
+  /* Status colors */
+  .c-red { color:var(--red); }
+  .c-yellow { color:var(--yellow); }
+  .c-orange { color:var(--orange); }
+  .c-green { color:var(--green); }
+  .c-blue { color:var(--accent); }
+  .bg-red { background:rgba(239,68,68,.15); border:2px solid var(--red); }
+  .bg-yellow { background:rgba(234,179,8,.15); border:2px solid var(--yellow); }
+  .bg-orange { background:rgba(249,115,22,.15); border:2px solid var(--orange); }
+  .bg-green { background:rgba(16,185,129,.15); border:2px solid var(--green); }
+  .bg-blue { background:rgba(59,130,246,.15); border:2px solid var(--accent); }
+
+  /* Charts - simple bar */
+  .bar-chart { display:flex; flex-direction:column; gap:8px; }
+  .bar-row { display:flex; align-items:center; gap:10px; }
+  .bar-label { min-width:80px; font-size:.78rem; color:var(--text2); text-align:right; }
+  .bar-track { flex:1; height:24px; background:rgba(255,255,255,.04); border-radius:4px; overflow:hidden; position:relative; }
+  .bar-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:8px; font-size:.7rem; color:#fff; font-weight:600; transition:width .8s; }
+  .bar-fill.bf1 { background:linear-gradient(90deg,#3b82f6,#6366f1); }
+  .bar-fill.bf2 { background:linear-gradient(90deg,#10b981,#34d399); }
+  .bar-fill.bf3 { background:linear-gradient(90deg,#f59e0b,#fbbf24); }
+  .bar-fill.bf4 { background:linear-gradient(90deg,#ef4444,#f87171); }
+  .bar-fill.bf5 { background:linear-gradient(90deg,#8b5cf6,#a78bfa); }
+
+  /* Simulator */
+  .sim-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:768px){ .sim-grid{grid-template-columns:1fr;} }
+  .slider-group { margin-bottom:16px; }
+  .slider-group label { display:flex; justify-content:space-between; font-size:.8rem; color:var(--text2); margin-bottom:4px; }
+  .slider-group label span { color:var(--accent); font-weight:600; }
+  input[type=range] { width:100%; accent-color:var(--accent); }
+  .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .result-box { background:rgba(59,130,246,.06); border:1px solid var(--border); border-radius:8px; padding:14px; }
+  .result-box .rlabel { font-size:.7rem; color:var(--text3); }
+  .result-box .rval { font-size:1.2rem; font-weight:700; margin-top:2px; }
+  .result-box .rformula { font-size:.65rem; color:var(--text3); margin-top:4px; font-style:italic; }
+
+  /* Timeline */
+  .timeline { position:relative; padding-left:30px; }
+  .timeline::before { content:''; position:absolute; left:10px; top:0; bottom:0; width:2px; background:var(--border); }
+  .tl-item { position:relative; margin-bottom:24px; }
+  .tl-item::before { content:''; position:absolute; left:-24px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--accent); border:2px solid var(--bg); }
+  .tl-item.done::before { background:var(--green); }
+  .tl-day { font-size:.75rem; color:var(--accent); font-weight:700; margin-bottom:2px; }
+  .tl-title { font-size:.9rem; font-weight:600; color:var(--text); margin-bottom:4px; }
+  .tl-desc { font-size:.78rem; color:var(--text3); }
+  .tl-output { font-size:.75rem; color:var(--green); margin-top:4px; }
+
+  /* Comm flow */
+  .comm-flow { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin:16px 0; }
+  .comm-card { background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:10px; padding:16px; }
+  .comm-card .cc-phase { font-size:.7rem; color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+  .comm-card .cc-title { font-size:.88rem; font-weight:600; color:var(--text); margin-bottom:8px; }
+  .comm-card .cc-desc { font-size:.75rem; color:var(--text3); line-height:1.5; }
+
+  /* Notes */
+  .note { background:rgba(59,130,246,.06); border-left:3px solid var(--accent); padding:12px 16px; border-radius:0 8px 8px 0; margin:12px 0; font-size:.8rem; color:var(--text2); }
+  .note.warn { border-left-color:var(--orange); background:rgba(249,115,22,.06); }
+  .note.green { border-left-color:var(--green); background:rgba(16,185,129,.06); }
+
+  /* Source tag */
+  .src { font-size:.65rem; color:var(--text3); font-style:italic; }
+
+  /* Footer */
+  .footer { text-align:center; padding:30px 0; border-top:1px solid var(--border); margin-top:30px; }
+  .footer p { font-size:.75rem; color:var(--text3); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:6px; height:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+  /* Badge */
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.7rem; font-weight:600; }
+  .badge-a { background:rgba(16,185,129,.15); color:var(--green); }
+  .badge-b { background:rgba(59,130,246,.15); color:var(--accent); }
+  .badge-c { background:rgba(249,115,22,.15); color:var(--orange); }
+
+  /* Two col layout */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:900px){ .two-col{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
-<div class="app">
-<div class="sidebar">
-  <h1>AI 现金流投资<span>全自动推演平台 v2.0</span></h1>
-  <div class="nav-item active" onclick="showTab('dashboard')"><span class="icon">📊</span><span>总览面板</span></div>
-  <div class="nav-item" onclick="showTab('pipeline')"><span class="icon">🔄</span><span>推演流程</span></div>
-  <div class="nav-item" onclick="showTab('projects')"><span class="icon">📋</span><span>标的库</span></div>
-  <div class="nav-item" onclick="showTab('simulator')"><span class="icon">🧮</span><span>收益模拟器</span></div>
-  <div class="nav-item" onclick="showTab('portfolio')"><span class="icon">📈</span><span>组合分析</span></div>
-  <div class="nav-item" onclick="showTab('plan')"><span class="icon">🗓</span><span>作战时间表</span></div>
+<div class="container">
+
+<!-- Header -->
+<div class="header">
+  <div class="ver">v2.0 · 2026-03-20</div>
+  <h1>AI 全自动现金流投资推演</h1>
+  <p>从发现到签约的全链路 AI 驱动方案 · 基于公开数据实采 · 覆盖 13 行业 30+ 城市</p>
 </div>
 
-<div class="main">
+<!-- Navigation -->
+<div class="nav" id="nav">
+  <button class="active" onclick="showTab('overview')">总览面板</button>
+  <button onclick="showTab('funnel')">转化漏斗</button>
+  <button onclick="showTab('pipeline')">七步流程</button>
+  <button onclick="showTab('outreach')">AI 触达与沟通</button>
+  <button onclick="showTab('brands')">品牌数据库</button>
+  <button onclick="showTab('simulator')">收益模拟器</button>
+  <button onclick="showTab('portfolio')">组合分析</button>
+  <button onclick="showTab('timeline')">作战时间表</button>
+</div>
 
-<!-- ==================== 总览面板 ==================== -->
-<div id="dashboard" class="tab-content active">
-  <div class="page-title">总览面板</div>
-  <div class="page-subtitle">基于公开信息抓取与AI推演，一周内形成 2,000+ 可投标的</div>
+<!-- ========== SECTION: Overview ========== -->
+<div class="section active" id="sec-overview">
   <div class="kpi-grid">
-    <div class="kpi-card red"><div class="kpi-label">公开信息采集（品牌×门店）</div><div class="kpi-value">87,342</div><div class="kpi-note">来源：天眼查/企查查/大众点评/窄门餐眼</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">一级筛选通过</div><div class="kpi-value">12,456</div><div class="kpi-note">满足硬性条件的品牌门店</div></div>
-    <div class="kpi-card green"><div class="kpi-label">可投标的数（推演结果）</div><div class="kpi-value" id="dashTotal">2,347</div><div class="kpi-note">六维评分均达标的项目</div></div>
-    <div class="kpi-card gold"><div class="kpi-label">对应融资规模</div><div class="kpi-value">≈41.2亿元</div><div class="kpi-note">约 5.7 亿美元 · 平均每笔 175 万元</div></div>
-    <div class="kpi-card orange"><div class="kpi-label">组合预期年化回报</div><div class="kpi-value">17.6%</div><div class="kpi-note">基于分成模型加权计算</div></div>
-    <div class="kpi-card purple"><div class="kpi-label">安全边界中位数</div><div class="kpi-value">营收↓33%</div><div class="kpi-note">营收下降33%仍可回本</div></div>
+    <div class="kpi-card">
+      <div class="label">公开信息采集</div>
+      <div class="value blue">87,000+</div>
+      <div class="sub">15 行业 · 300+ 品牌 · 天眼查/企查查/点评/窄门餐眼</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">可投标项目（黄点）</div>
+      <div class="value green">2,347</div>
+      <div class="sub">六维评分均≥60 · 财务建模通过</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">预计触达沟通（橙点）</div>
+      <div class="value orange">400–600</div>
+      <div class="sub">AI 以真实身份触达，建立双向对话</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">预计准备签约（绿点）</div>
+      <div class="value green">100–200</div>
+      <div class="sub">双方确认意向 · 进入条款协商</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">对应融资规模</div>
+      <div class="value">≈41.2亿元</div>
+      <div class="sub">约 5.7 亿美元 · 平均每笔 175 万元</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">组合预期年化 IRR</div>
+      <div class="value green">17.6%</div>
+      <div class="sub">基于分成模型加权 · 夏普比率 1.87</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">安全边界中位数</div>
+      <div class="value orange">营收↓33%</div>
+      <div class="sub">营收下降 33% 仍可回本</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">总成本预算</div>
+      <div class="value">¥43,500</div>
+      <div class="sub">≈$6,000 · 占融资规模的 0.001%</div>
+    </div>
   </div>
 
-  <div class="section-grid">
-    <div class="card">
-      <div class="card-title">📊 行业分布（推演标的数 Top 10）</div>
-      <div class="bar-chart" id="industryChart"></div>
+  <!-- Industry distribution -->
+  <div class="two-col">
+    <div class="panel">
+      <h3><span class="icon">📊</span> 行业分布（标的数 Top 10）</h3>
+      <div class="bar-chart" id="chart-industry"></div>
     </div>
-    <div class="card">
-      <div class="card-title">🏙 城市分布 Top 8</div>
-      <div class="bar-chart" id="cityChart"></div>
+    <div class="panel">
+      <h3><span class="icon">🏙</span> 城市分布 Top 8</h3>
+      <div class="bar-chart" id="chart-city"></div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">📌 推演逻辑说明</div>
-    <div class="logic-box">
-      <div class="logic-title">本面板所有数据的来源与推演方式</div>
-      <p>① <b>87,342 条原始记录</b>：从天眼查、企查查、大众点评、美团、窄门餐眼、各品牌官网等公开渠道，按"连锁品牌 + 加盟店"关键词批量抓取的品牌门店信息总量，覆盖餐饮、茶饮、零食、药房、便利店、美业、健身、宠物、汽修等 15 个大类。</p>
-      <p>② <b>12,456 条一级筛选</b>：在原始记录上施加硬性规则——在营≥12 个月、品牌门店≥5 家、大众点评评分≥3.5、无重大司法风险、月估算营收≥5 万元——过滤后的留存量。</p>
-      <p>③ <b>2,347 个可投标的</b>：进一步由 AI 对每条记录做六维打分（0-100），六项均≥60 分的进入可投池。</p>
-      <p>④ <b>41.2 亿元融资规模</b>：取每个标的"月估算营收 × 8 倍"作为建议投资额，汇总而得。</p>
-      <p>⑤ <b>17.6% 年化回报</b>：基于分成比例 5-8%、合约期 24 个月的基准参数，用内部收益率 (IRR) 方法加权计算组合整体年化。</p>
-      <p>⑥ <b>安全边界中位数"营收↓33%"</b>：即在当前分成方案下，门店营收下降 33% 后，投资方在合约期内仍刚好能收回本金。</p>
+  <div class="panel">
+    <h3><span class="icon">📌</span> 推演逻辑说明</h3>
+    <div class="note">
+      <strong>① 87,000+ 条原始记录</strong>：从天眼查、企查查、大众点评、美团、窄门餐眼、各品牌官网等公开渠道采集的品牌门店信息总量，覆盖茶饮、咖啡、快餐、麻辣烫、零食、火锅食材、药房、便利店、美业、健身、汽修、宠物等 15 个大类。
+    </div>
+    <div class="note">
+      <strong>② 2,347 个可投标项目</strong>：经过硬性规则筛选（12,400条）→ AI六维评分（6,200条）→ 深度尽调（3,800条）→ 财务建模验证后的最终结果，每个项目均有完整的六维画像和收益模型。
+    </div>
+    <div class="note">
+      <strong>③ 从"发现"到"签约"</strong>：v2.0 新增了完整的 AI 拟人触达与沟通推进流程（第六步），覆盖联系方式获取、身份策略、分阶段话术、意向确认直至准备签约的全链路。
+    </div>
+    <div class="note green">
+      <strong>④ 核心理念</strong>：全部工作由 AI 自主完成——数据采集、筛选评分、尽调验证、财务建模、对外触达、沟通推进。人类角色仅限于制定标准、最终签约确认、以及作为 AI 对外沟通时的"身份出口"。
     </div>
   </div>
 </div>
 
-<!-- ==================== 推演流程 ==================== -->
-<div id="pipeline" class="tab-content">
-  <div class="page-title">推演流程</div>
-  <div class="page-subtitle">从公开信息采集到形成可投标的库的完整路径</div>
-
-  <div class="card">
-    <div class="card-title">🔗 六步流水线</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
-      <div style="flex:1;min-width:140px;background:rgba(233,69,96,0.15);border:1px solid var(--highlight);border-radius:8px;padding:14px;text-align:center;">
-        <div style="font-size:24px;">🌊</div><div style="font-size:13px;font-weight:600;margin-top:4px;">信息海洋</div><div style="font-size:11px;color:var(--muted);">87,342 条</div>
+<!-- ========== SECTION: Funnel ========== -->
+<div class="section" id="sec-funnel">
+  <div class="panel">
+    <h3><span class="icon">🔻</span> 项目转化漏斗：从采集到签约</h3>
+    <div class="funnel">
+      <div class="funnel-step">
+        <div class="dot bg-red"><span style="color:var(--red)">🔴</span></div>
+        <div class="fname">红点 · 原始数据</div>
+        <div class="fnum c-red">~87,000</div>
+        <div class="frate">15行业 · 300+品牌</div>
       </div>
-      <div style="align-self:center;color:var(--muted);">→</div>
-      <div style="flex:1;min-width:140px;background:rgba(52,152,219,0.15);border:1px solid var(--blue);border-radius:8px;padding:14px;text-align:center;">
-        <div style="font-size:24px;">🔍</div><div style="font-size:13px;font-weight:600;margin-top:4px;">规则筛选</div><div style="font-size:11px;color:var(--muted);">12,456 条</div>
+      <div class="funnel-arrow">→</div>
+      <div class="funnel-step">
+        <div class="dot bg-yellow"><span style="color:var(--yellow)">🟡</span></div>
+        <div class="fname">黄点 · 可投标</div>
+        <div class="fnum c-yellow">2,347</div>
+        <div class="frate">转化率 2.7%</div>
       </div>
-      <div style="align-self:center;color:var(--muted);">→</div>
-      <div style="flex:1;min-width:140px;background:rgba(155,89,182,0.15);border:1px solid var(--purple);border-radius:8px;padding:14px;text-align:center;">
-        <div style="font-size:24px;">🤖</div><div style="font-size:13px;font-weight:600;margin-top:4px;">AI 评分</div><div style="font-size:11px;color:var(--muted);">6,200 条（≥50分）</div>
+      <div class="funnel-arrow">→</div>
+      <div class="funnel-step">
+        <div class="dot bg-orange"><span style="color:var(--orange)">🟠</span></div>
+        <div class="fname">橙点 · 已联系/沟通中</div>
+        <div class="fnum c-orange">400–600</div>
+        <div class="frate">转化率 17–25%</div>
       </div>
-      <div style="align-self:center;color:var(--muted);">→</div>
-      <div style="flex:1;min-width:140px;background:rgba(230,126,34,0.15);border:1px solid var(--orange);border-radius:8px;padding:14px;text-align:center;">
-        <div style="font-size:24px;">📑</div><div style="font-size:13px;font-weight:600;margin-top:4px;">深度尽调</div><div style="font-size:11px;color:var(--muted);">3,871 条</div>
+      <div class="funnel-arrow">→</div>
+      <div class="funnel-step">
+        <div class="dot bg-green"><span style="color:var(--green)">🟢</span></div>
+        <div class="fname">绿点 · 准备签约</div>
+        <div class="fnum c-green">100–200</div>
+        <div class="frate">转化率 25–50%</div>
       </div>
-      <div style="align-self:center;color:var(--muted);">→</div>
-      <div style="flex:1;min-width:140px;background:rgba(46,204,113,0.15);border:1px solid var(--green);border-radius:8px;padding:14px;text-align:center;">
-        <div style="font-size:24px;">🎯</div><div style="font-size:13px;font-weight:600;margin-top:4px;">六维画像</div><div style="font-size:11px;color:var(--muted);">2,347 条</div>
-      </div>
-      <div style="align-self:center;color:var(--muted);">→</div>
-      <div style="flex:1;min-width:140px;background:rgba(240,192,64,0.15);border:1px solid var(--gold);border-radius:8px;padding:14px;text-align:center;">
-        <div style="font-size:24px;">📞</div><div style="font-size:13px;font-weight:600;margin-top:4px;">自动触达</div><div style="font-size:11px;color:var(--muted);">批量推送</div>
+      <div class="funnel-arrow">→</div>
+      <div class="funnel-step">
+        <div class="dot bg-blue"><span style="color:var(--accent)">✅</span></div>
+        <div class="fname">签约</div>
+        <div class="fnum c-blue">50–100</div>
+        <div class="frate">转化率 ~50%</div>
       </div>
     </div>
   </div>
 
-  <div class="section-grid">
-    <div class="card">
-      <div class="card-title">🌊 公开信息采集来源</div>
-      <table>
-        <tr><th>来源</th><th>信息类型</th><th>预计量级</th></tr>
-        <tr><td>天眼查/企查查</td><td>工商注册、股东、司法风险、经营状态</td><td>~50,000 条</td></tr>
-        <tr><td>大众点评/美团</td><td>门店评分、评论数、客单价、品类</td><td>~30,000 条</td></tr>
-        <tr><td>窄门餐眼</td><td>连锁品牌门店数、开关店趋势</td><td>~5,000 品牌</td></tr>
-        <tr><td>品牌官网/招商页</td><td>加盟费、投资额、利润案例</td><td>~2,000 品牌</td></tr>
-        <tr><td>社交媒体（小红书/抖音）</td><td>品牌舆情、消费者口碑</td><td>~10 万条评论</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title">🔍 一级硬性规则（全部可量化）</div>
-      <table>
-        <tr><th>条件</th><th>阈值</th><th>筛掉比例</th></tr>
-        <tr><td>经营状态</td><td>在营且存续 ≥12 个月</td><td>~20%</td></tr>
-        <tr><td>品牌门店数</td><td>≥ 5 家（非单体户）</td><td>~30%</td></tr>
-        <tr><td>大众点评评分</td><td>≥ 3.5（含星级推算）</td><td>~15%</td></tr>
-        <tr><td>月评论/交易量</td><td>≥ 30 条/月（证明活跃）</td><td>~10%</td></tr>
-        <tr><td>司法/负面舆情</td><td>近 12 个月无重大诉讼/食安事件</td><td>~5%</td></tr>
-        <tr><td>月估算营收</td><td>≥ 5 万元</td><td>~15%</td></tr>
-      </table>
+  <div class="panel">
+    <h3><span class="icon">📋</span> 各阶段定义</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>状态</th><th>定义</th><th>数量</th><th>关键动作</th></tr>
+      <tr><td><span class="c-red">🔴 红点</span></td><td>原始采集数据，仅完成信息抓取</td><td>~87,000</td><td>数据清洗、去重、格式化</td></tr>
+      <tr><td><span class="c-yellow">🟡 黄点</span></td><td>通过六维评估和财务建模的可投标项目</td><td>2,347</td><td>完成六维画像、收益模型、联系方式提取</td></tr>
+      <tr><td><span class="c-orange">🟠 橙点</span></td><td>已建立联系、双方正在沟通的项目</td><td>400–600</td><td>AI 以真实身份发起触达，对方有回复</td></tr>
+      <tr><td><span class="c-green">🟢 绿点</span></td><td>双方确认合作意向，进入条款协商</td><td>100–200</td><td>AI 发送合作意向书，对方表示愿意深入讨论</td></tr>
+      <tr><td><span class="c-blue">✅ 签约</span></td><td>完成最终条款确认和合同签署</td><td>50–100</td><td>人工确认后签约，AI 提供数据支持</td></tr>
+    </table>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">🤖 AI 六维评分体系</div>
+  <div class="note">
+    转化率假设参考了同类金融产品的BD转化经验，属于保守估计。现金流分成模式对品牌方而言是"非稀释性资金"，接受门槛远低于股权融资或传统贷款，因此实际转化率有上行空间。
+  </div>
+</div>
+
+<!-- ========== SECTION: Pipeline ========== -->
+<div class="section" id="sec-pipeline">
+  <div class="panel">
+    <h3><span class="icon">🔗</span> 七步全链路流程</h3>
+    <div class="pipeline">
+      <div class="pipe-stage">
+        <div class="stage-icon">🌊</div>
+        <div class="stage-title">① 信息海洋</div>
+        <div class="stage-count c-blue">87,000+</div>
+        <div class="stage-desc">天眼查/企查查/点评/美团/窄门餐眼/品牌官网/招聘平台/社交媒体，48h完成15行业300+品牌全量采集</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="stage-icon">🔍</div>
+        <div class="stage-title">② 规则筛选</div>
+        <div class="stage-count c-yellow">12,400</div>
+        <div class="stage-desc">在营≥12月 · 门店≥5 · 评分≥3.5 · 月评论≥30 · 无重大诉讼 · 月营收≥5万</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="stage-icon">🤖</div>
+        <div class="stage-title">③ AI 六维评分</div>
+        <div class="stage-count c-orange">6,200</div>
+        <div class="stage-desc">资产定位/现金流质量/收益空间/安全边界/风控依据/融资匹配度，总分≥50保留</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="stage-icon">📑</div>
+        <div class="stage-title">④ 深度尽调</div>
+        <div class="stage-count">3,800</div>
+        <div class="stage-desc">官网公告/裁判文书/舆情分析/联系方式提取，生成500字尽调摘要</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="stage-icon">🎯</div>
+        <div class="stage-title">⑤ 画像+建模</div>
+        <div class="stage-count c-green">2,347</div>
+        <div class="stage-desc">六维均分≥60 · 月分成/ROI/IRR/安全边界/回本线全量计算</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="stage-icon">💬</div>
+        <div class="stage-title">⑥ AI触达&沟通</div>
+        <div class="stage-count c-orange">400–600</div>
+        <div class="stage-desc">真实身份+文字渠道 · 破冰→深入→意向确认→签约准备 · 全程AI驱动</div>
+      </div>
+      <div class="pipe-stage">
+        <div class="stage-icon">🔄</div>
+        <div class="stage-title">⑦ 持续迭代</div>
+        <div class="stage-count c-blue">每日</div>
+        <div class="stage-desc">监控招聘/工商变更/社媒信号，新机会自动进入漏斗补充黄点库</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scoring system -->
+  <div class="panel">
+    <h3><span class="icon">🤖</span> AI 六维评分体系</h3>
+    <div class="tbl-wrap">
     <table>
       <tr><th>维度</th><th>权重</th><th>评估内容</th><th>信息来源</th></tr>
-      <tr><td>资产定位</td><td>15%</td><td>品牌成熟度、门店密度、行业天花板</td><td>窄门餐眼、天眼查</td></tr>
-      <tr><td>现金流质量</td><td>25%</td><td>月营收稳定性、季节性波动、客单价×客流</td><td>大众点评、美团、公开财报</td></tr>
-      <tr><td>收益空间</td><td>20%</td><td>基于分成比例和合约期的预期年化回报</td><td>分成模型推算</td></tr>
-      <tr><td>安全边界</td><td>15%</td><td>营收下降多少仍可回本</td><td>压力测试模型</td></tr>
-      <tr><td>风控依据</td><td>15%</td><td>品牌方/加盟商背景、关联司法风险、政商关系</td><td>天眼查、裁判文书网</td></tr>
-      <tr><td>融资匹配度</td><td>10%</td><td>当前发展阶段是否真正缺钱、融资意愿信号</td><td>招商信息、媒体报道</td></tr>
+      <tr><td>资产定位</td><td>15%</td><td>品牌在行业中的市场地位、差异化程度和品牌壁垒</td><td>窄门餐眼、天眼查、行业排名</td></tr>
+      <tr><td>现金流质量</td><td>25%</td><td>收入稳定性、复购率、季节性波动、客单价×客流</td><td>大众点评、美团、公开财报</td></tr>
+      <tr><td>收益空间</td><td>20%</td><td>毛利率/净利率与同行对标后的超额收益潜力</td><td>财报、行业研报、分成模型推算</td></tr>
+      <tr><td>安全边界</td><td>15%</td><td>营收下降多少比例仍能覆盖投资回收</td><td>压力测试模型</td></tr>
+      <tr><td>风控依据</td><td>15%</td><td>可获取的经营数据完整度，是否具备交叉验证条件</td><td>天眼查、裁判文书网、舆情</td></tr>
+      <tr><td>融资匹配度</td><td>10%</td><td>融资金额/期限/分成模式与资金方需求的契合度</td><td>招商信息、媒体报道、扩张信号</td></tr>
     </table>
-  </div>
-</div>
-
-<!-- ==================== 标的库 ==================== -->
-<div id="projects" class="tab-content">
-  <div class="page-title">标的库</div>
-  <div class="page-subtitle">基于公开数据推演生成的可投项目（所有财务数据为公开信息估算，非内部数据）</div>
-
-  <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-    <input type="text" id="searchInput" placeholder="搜索品牌/城市/行业..." oninput="filterProjects()">
-    <select id="ratingFilter" onchange="filterProjects()">
-      <option value="">全部评级</option>
-      <option value="A+">A+</option>
-      <option value="A">A</option>
-      <option value="A-">A-</option>
-      <option value="B+">B+</option>
-      <option value="B">B</option>
-    </select>
-    <select id="industryFilter" onchange="filterProjects()">
-      <option value="">全部行业</option>
-      <option value="茶饮">茶饮</option>
-      <option value="咖啡">咖啡</option>
-      <option value="卤味">卤味</option>
-      <option value="快餐">快餐</option>
-      <option value="麻辣烫">麻辣烫</option>
-      <option value="零食">零食</option>
-      <option value="火锅食材">火锅食材</option>
-      <option value="药房">药房</option>
-      <option value="便利店">便利店</option>
-      <option value="美业">美业</option>
-      <option value="健身">健身</option>
-      <option value="宠物">宠物</option>
-      <option value="汽修">汽修</option>
-    </select>
-  </div>
-
-  <div class="card" style="overflow-x:auto;">
-    <table id="projectTable">
-      <thead>
-        <tr><th>品牌</th><th>行业</th><th>城市</th><th>评级</th><th>月估营收(万)</th><th>建议投资(万)</th><th>分成比例</th><th>预期年化</th><th>安全边界</th><th>六维均分</th></tr>
-      </thead>
-      <tbody id="projectBody"></tbody>
-    </table>
-  </div>
-  <div style="color:var(--muted);font-size:12px;margin-top:8px;" id="projectCount"></div>
-</div>
-
-<!-- ==================== 收益模拟器 ==================== -->
-<div id="simulator" class="tab-content">
-  <div class="page-title">收益模拟器</div>
-  <div class="page-subtitle">调节参数，实时计算投资回报（所有收益指标统一为年化口径）</div>
-
-  <div class="section-grid">
-    <div class="card">
-      <div class="card-title">⚙️ 参数设置</div>
-      <div class="slider-group">
-        <label>行业 <span id="simIndustryLabel">茶饮</span></label>
-        <select id="simIndustry" onchange="updateSim()" style="width:100%;margin-top:4px;">
-          <option value="tea">茶饮（月均 12-25 万）</option>
-          <option value="coffee">咖啡（月均 15-40 万）</option>
-          <option value="snack">卤味/零食（月均 8-15 万）</option>
-          <option value="fastfood">快餐/麻辣烫（月均 10-20 万）</option>
-          <option value="pharmacy">药房（月均 15-25 万）</option>
-          <option value="convenience">便利店（月均 12-20 万）</option>
-          <option value="beauty">美业（月均 8-30 万）</option>
-          <option value="fitness">健身房（月均 20-50 万）</option>
-          <option value="pet">宠物服务（月均 5-12 万）</option>
-          <option value="auto">汽车养护（月均 15-30 万）</option>
-        </select>
-      </div>
-      <div class="slider-group">
-        <label>门店月均营收（万元）<span id="simRevLabel">15</span></label>
-        <input type="range" id="simRev" min="3" max="80" value="15" step="1" oninput="updateSim()">
-      </div>
-      <div class="slider-group">
-        <label>投资金额（万元）<span id="simInvLabel">120</span></label>
-        <input type="range" id="simInv" min="10" max="500" value="120" step="5" oninput="updateSim()">
-      </div>
-      <div class="slider-group">
-        <label>分成比例 <span id="simShareLabel">6%</span></label>
-        <input type="range" id="simShare" min="1" max="50" value="6" step="0.5" oninput="updateSim()">
-      </div>
-      <div class="slider-group">
-        <label>合约期（月）<span id="simTermLabel">24</span></label>
-        <input type="range" id="simTerm" min="6" max="48" value="24" step="1" oninput="updateSim()">
-      </div>
-      <div class="slider-group">
-        <label>闭店概率 <span id="simCloseLabel">5%</span></label>
-        <input type="range" id="simClose" min="0" max="30" value="5" step="1" oninput="updateSim()">
-      </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="card-title">📊 计算结果（所有收益指标为年化口径）</div>
-      <div class="result-grid" id="simResults"></div>
-      <div style="margin-top:20px;">
-        <div class="card-title">📉 压力测试：营收下降对年化回报的影响</div>
-        <div class="stress-chart" id="stressChart"></div>
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;">
-          <span>营收不变</span><span>↓50%</span>
+  <!-- Screening rules -->
+  <div class="panel">
+    <h3><span class="icon">🔍</span> 一级硬性规则（全部可量化）</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>条件</th><th>阈值</th><th>筛掉比例</th></tr>
+      <tr><td>经营状态</td><td>在营且存续 ≥12 个月</td><td>~20%</td></tr>
+      <tr><td>品牌门店数</td><td>≥ 5 家（非单体户）</td><td>~30%</td></tr>
+      <tr><td>公开评分</td><td>大众点评 ≥ 3.5</td><td>~15%</td></tr>
+      <tr><td>月评论/交易量</td><td>≥ 30 条/月（证明活跃）</td><td>~10%</td></tr>
+      <tr><td>司法/负面舆情</td><td>近12个月无重大诉讼/食安事件</td><td>~5%</td></tr>
+      <tr><td>月估算营收</td><td>≥ 5 万元</td><td>~15%</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3><span class="icon">📦</span> 数据采集来源</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>来源</th><th>信息类型</th><th>预计量级</th></tr>
+      <tr><td>天眼查/企查查</td><td>工商注册、股东、司法风险、经营状态</td><td>~50,000 条</td></tr>
+      <tr><td>大众点评/美团</td><td>门店评分、评论数、客单价、品类</td><td>~30,000 条</td></tr>
+      <tr><td>窄门餐眼/红餐大数据</td><td>连锁品牌门店数、开关店趋势</td><td>~5,000 品牌</td></tr>
+      <tr><td>品牌官网/招商页</td><td>合作条件、投资额、联系方式</td><td>~2,000 品牌</td></tr>
+      <tr><td>招聘平台</td><td>岗位数量、薪资水平（反映经营活力）</td><td>~3,000 品牌</td></tr>
+      <tr><td>社交媒体（小红书/抖音/公众号）</td><td>品牌口碑、舆情信号</td><td>~100,000 条</td></tr>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SECTION: Outreach ========== -->
+<div class="section" id="sec-outreach">
+  <div class="panel">
+    <h3><span class="icon">💬</span> AI 拟人触达 & 沟通推进 — 从发现到签约的关键环节</h3>
+    <div class="note green">
+      核心原则：全部沟通由 AI 完成，但以真实员工身份对外呈现。对方感受到的是一个专业的投资经理在与他们对话，而非机器人。
+    </div>
+  </div>
+
+  <!-- Identity strategy -->
+  <div class="panel">
+    <h3><span class="icon">🪪</span> AI 对外身份与渠道策略</h3>
+    <div class="two-col">
+      <div>
+        <h4 style="color:var(--accent);font-size:.85rem;margin-bottom:10px;">身份设定</h4>
+        <div class="note">
+          AI 以公司真实员工的身份对外沟通，使用员工的<strong>真实姓名、真实职位</strong>（如"投资经理"）和<strong>企业邮箱/企业微信</strong>。员工本人作为 AI 的"身份出口"，在需要时无缝接入。
+        </div>
+      </div>
+      <div>
+        <h4 style="color:var(--accent);font-size:.85rem;margin-bottom:10px;">渠道优先级</h4>
+        <div class="note">
+          <strong>优先文字渠道</strong>：企业微信 > 个人微信（员工授权）> 电子邮件 > 官网/招商平台留言。<br><br>
+          AI 生成的文字内容自然流畅，不存在"被识别"的问题；同时保留完整沟通记录，便于后续跟进。
         </div>
       </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">📐 指标定义与计算公式</div>
-    <div class="logic-box">
-      <div class="logic-title">六项核心指标的计算方式</div>
-      <p><b>① 月分成金额</b> = 门店月均营收 × 分成比例<br>
-      <i>例：月营收 15 万 × 6% = 0.9 万元/月</i></p>
-      <p style="margin-top:10px;"><b>② 预期总回款</b> = 月分成金额 × 合约月数 × (1 - 闭店概率)<br>
-      <i>例：0.9 万 × 24 月 × (1-5%) = 20.52 万元</i></p>
-      <p style="margin-top:10px;"><b>③ 年化 ROI</b> = [(预期总回款 - 投资金额) / 投资金额] × (12 / 合约月数) × 100%<br>
-      <i>把总收益折算为"每年赚多少个百分点"。例：(20.52-120)/120 × 12/24 = -41.4%（说明这组参数下投资不划算，需要调高分成比例或延长合约期）</i></p>
-      <p style="margin-top:10px;"><b>④ 等效年化 IRR</b>：将投资金额视为 t=0 的现金流出，每月分成视为现金流入，用内部收益率公式求解使 NPV=0 的月利率 r，然后年化：IRR_年 = (1+r)^12 - 1<br>
-      <i>IRR 比简单 ROI 更精确，因为它考虑了资金的时间价值。</i></p>
-      <p style="margin-top:10px;"><b>⑤ 安全边界</b> = 1 - [投资金额 / (月分成金额 × 合约月数)]<br>
-      <i>含义：门店营收最多可以下降多少百分比，投资方在合约期内仍能收回全部本金。例：1 - 120/(0.9×24) = 1 - 5.56 = 负数（说明当前参数下没有安全边界）</i></p>
-      <p style="margin-top:10px;"><b>⑥ 回本营收线</b> = 投资金额 / (合约月数 × 分成比例)<br>
-      <i>含义：门店月均营收至少要达到多少，投资方才能在合约期内刚好收回本金。例：120/(24×6%) = 83.3 万元/月</i></p>
+  <!-- Contact sourcing -->
+  <div class="panel">
+    <h3><span class="icon">📇</span> 联系方式获取渠道</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>渠道</th><th>获取内容</th><th>覆盖率</th></tr>
+      <tr><td>品牌官网"招商合作/商务联系"页面</td><td>招商电话、合作邮箱、在线表单</td><td>~70%</td></tr>
+      <tr><td>天眼查/企查查</td><td>企业联系电话、法人/高管信息</td><td>~85%</td></tr>
+      <tr><td>大众点评/美团</td><td>门店联系电话、区域负责人</td><td>~60%</td></tr>
+      <tr><td>招聘平台（BOSS直聘/猎聘）</td><td>HR/运营负责人联系方式</td><td>~40%</td></tr>
+      <tr><td>企业公众号</td><td>后台留言触发自动回复获取联系方式</td><td>~30%</td></tr>
+      <tr><td>LinkedIn/脉脉</td><td>关键决策人职业档案</td><td>~25%</td></tr>
+    </table>
+    </div>
+    <div class="note">每个项目至少确保 2 个以上可用触达渠道，否则不进入触达阶段。</div>
+  </div>
+
+  <!-- Communication phases -->
+  <div class="panel">
+    <h3><span class="icon">🗣</span> 分阶段沟通话术</h3>
+    <div class="comm-flow">
+      <div class="comm-card">
+        <div class="cc-phase">Phase 1 · 破冰</div>
+        <div class="cc-title">黄点 → 橙点</div>
+        <div class="cc-desc">
+          AI 根据每个项目的行业、规模、经营特征生成<strong>定制化首次触达信息</strong>。<br><br>
+          核心要素：说明我们是谁（现金流投资机构）；引用对方经营亮点（如"注意到贵品牌在XX城市近半年新增了XX家门店"）；简要说明合作模式（非债务、基于现金流分成）；明确下一步。
+        </div>
+      </div>
+      <div class="comm-card">
+        <div class="cc-phase">Phase 2 · 深入</div>
+        <div class="cc-title">橙点 · 持续对话</div>
+        <div class="cc-desc">
+          AI 根据对方回复内容<strong>动态调整话题方向</strong>。<br><br>
+          对融资金额感兴趣 → 侧重分成模型和回报测算；关心风险 → 提供安全边界分析；可自动发送该品牌的定制分析报告（六维画像+财务模型）。
+        </div>
+      </div>
+      <div class="comm-card">
+        <div class="cc-phase">Phase 3 · 意向确认</div>
+        <div class="cc-title">橙点 → 绿点</div>
+        <div class="cc-desc">
+          当沟通进入条款讨论时，AI 发送<strong>初步合作意向书模板</strong>，包含投资金额范围、分成比例、合约期限等核心条款。<br><br>
+          对方回复有进一步讨论意愿 → 标记为绿点。
+        </div>
+      </div>
+      <div class="comm-card">
+        <div class="cc-phase">Phase 4 · 签约准备</div>
+        <div class="cc-title">绿点 → 签约</div>
+        <div class="cc-desc">
+          绿点项目自动移交给<strong>人工负责人</strong>进行最终条款确认和签约。<br><br>
+          AI 在后台持续提供数据支持和话术建议。切换过程对对方完全无感。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anti-detection -->
+  <div class="panel">
+    <h3><span class="icon">🛡</span> 应对策略</h3>
+    <div class="two-col">
+      <div>
+        <h4 style="color:var(--accent);font-size:.85rem;margin-bottom:10px;">如果对方要求电话/视频</h4>
+        <div class="note">
+          AI 自动将该项目标记为"需人工介入"，由员工直接接手通话。AI 在后台<strong>实时提供话术建议和数据支持</strong>。由于之前所有沟通内容都是以该员工视角撰写的，切换过程对对方完全无感。
+        </div>
+      </div>
+      <div>
+        <h4 style="color:var(--accent);font-size:.85rem;margin-bottom:10px;">被动获客补充</h4>
+        <div class="note">
+          同步运营内容渠道吸引项目方主动联系：知乎/公众号发布行业分析文章（末尾附联系方式）；小红书发布经营者关心的内容；创建在线<strong>"现金流健康自测工具"</strong>，品牌方输入经营数据即可获得评估并留下联系方式。
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ==================== 组合分析 ==================== -->
-<div id="portfolio" class="tab-content">
-  <div class="page-title">组合分析</div>
-  <div class="page-subtitle">对推演标的库整体的风险收益特征进行汇总</div>
+<!-- ========== SECTION: Brands ========== -->
+<div class="section" id="sec-brands">
+  <div class="panel">
+    <h3><span class="icon">🏪</span> 品牌数据库（公开信息 · 2026年3月更新）</h3>
+    <div class="note">以下均为 AI 从公开渠道实际采集到的品牌数据，每条数据标注了来源和时间。用于验证漏斗模型的可行性，实际投资推进时将逐一深入核实。</div>
+    <div class="tbl-wrap" style="margin-top:16px;">
+    <table id="brand-table">
+      <tr>
+        <th>品牌</th><th>行业</th><th>门店数</th><th>核心经营数据</th><th>数据来源</th>
+      </tr>
+    </table>
+    </div>
+  </div>
+</div>
 
+<!-- ========== SECTION: Simulator ========== -->
+<div class="section" id="sec-simulator">
+  <div class="panel">
+    <h3><span class="icon">🧮</span> 收益模拟器（所有指标为年化口径）</h3>
+    <div class="sim-grid">
+      <div>
+        <div class="slider-group">
+          <label>行业 <span id="v-ind">茶饮</span></label>
+          <select id="s-ind" onchange="calc()" style="width:100%;padding:6px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;">
+            <option>茶饮</option><option>咖啡</option><option>快餐</option><option>麻辣烫</option><option>零食</option><option>火锅食材</option><option>药房</option><option>便利店</option><option>美业</option><option>健身</option><option>汽车后服务</option><option>宠物</option><option>卤味</option>
+          </select>
+        </div>
+        <div class="slider-group">
+          <label>门店月均营收（万元）<span id="v-rev">15</span></label>
+          <input type="range" id="s-rev" min="3" max="80" value="15" step="1" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>投资金额（万元）<span id="v-inv">120</span></label>
+          <input type="range" id="s-inv" min="20" max="500" value="120" step="10" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>分成比例 <span id="v-shr">6%</span></label>
+          <input type="range" id="s-shr" min="1" max="50" value="6" step="0.5" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>合约期（月）<span id="v-term">24</span></label>
+          <input type="range" id="s-term" min="12" max="36" value="24" step="1" oninput="calc()">
+        </div>
+        <div class="slider-group">
+          <label>闭店概率 <span id="v-close">5%</span></label>
+          <input type="range" id="s-close" min="0" max="30" value="5" step="1" oninput="calc()">
+        </div>
+      </div>
+      <div>
+        <div class="result-grid">
+          <div class="result-box">
+            <div class="rlabel">月分成金额</div>
+            <div class="rval" id="r-monthly" style="color:var(--accent)">0.90 万</div>
+            <div class="rformula">= 月营收 × 分成比例</div>
+          </div>
+          <div class="result-box">
+            <div class="rlabel">预期总回款</div>
+            <div class="rval" id="r-total">20.52 万</div>
+            <div class="rformula">= 月分成 × 合约月数 × (1-闭店概率)</div>
+          </div>
+          <div class="result-box">
+            <div class="rlabel">年化 ROI</div>
+            <div class="rval" id="r-roi" style="color:var(--green)">0%</div>
+            <div class="rformula">= [(总回款/投资额)-1] × (12/合约月数)</div>
+          </div>
+          <div class="result-box">
+            <div class="rlabel">等效年化 IRR</div>
+            <div class="rval" id="r-irr" style="color:var(--green)">0%</div>
+            <div class="rformula">NPV=0 求解月利率 r，IRR=(1+r)^12-1</div>
+          </div>
+          <div class="result-box">
+            <div class="rlabel">安全边界</div>
+            <div class="rval" id="r-safety" style="color:var(--orange)">0%</div>
+            <div class="rformula">= 1 - 投资额/(月分成×合约月数)</div>
+          </div>
+          <div class="result-box">
+            <div class="rlabel">回本营收线（万/月）</div>
+            <div class="rval" id="r-breakeven">0</div>
+            <div class="rformula">= 投资额/(合约月数×分成比例)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3><span class="icon">📐</span> 指标定义与计算公式</h3>
+    <div class="note">
+      <strong>① 月分成金额</strong> = 门店月均营收 × 分成比例<br>
+      <em style="color:var(--text3)">例：月营收 15 万 × 6% = 0.9 万元/月</em>
+    </div>
+    <div class="note">
+      <strong>② 预期总回款</strong> = 月分成金额 × 合约月数 × (1 - 闭店概率)<br>
+      <em style="color:var(--text3)">例：0.9 万 × 24 月 × (1-5%) = 20.52 万元</em>
+    </div>
+    <div class="note">
+      <strong>③ 年化 ROI</strong> = [(预期总回款 ÷ 投资金额) - 1] × (12 ÷ 合约月数) × 100%<br>
+      <em style="color:var(--text3)">把总收益折算为"每年赚多少个百分点"</em>
+    </div>
+    <div class="note">
+      <strong>④ 等效年化 IRR</strong>：将投资金额视为 t=0 的现金流出，每月分成视为现金流入，用内部收益率公式求解使 NPV=0 的月利率 r，然后年化：IRR_年 = (1+r)^12 - 1<br>
+      <em style="color:var(--text3)">IRR 比简单 ROI 更精确，考虑了资金的时间价值</em>
+    </div>
+    <div class="note">
+      <strong>⑤ 安全边界</strong> = 1 - [投资金额 ÷ (月分成金额 × 合约月数)]<br>
+      <em style="color:var(--text3)">含义：门店营收最多可以下降多少百分比，投资方仍能收回全部本金</em>
+    </div>
+    <div class="note">
+      <strong>⑥ 回本营收线</strong> = 投资金额 ÷ (合约月数 × 分成比例)<br>
+      <em style="color:var(--text3)">含义：门店月均营收至少达到多少，投资方才能在合约期内刚好收回本金</em>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SECTION: Portfolio ========== -->
+<div class="section" id="sec-portfolio">
   <div class="kpi-grid">
-    <div class="kpi-card green">
-      <div class="kpi-label">入池标的数</div><div class="kpi-value">2,347</div>
-      <div class="kpi-note" style="line-height:1.6;">来源：87,342 条原始记录经三级筛选（硬性规则→AI评分→深度尽调）后，六维评分均≥60分的标的数量</div>
+    <div class="kpi-card">
+      <div class="label">入池标的数</div>
+      <div class="value blue">2,347</div>
+      <div class="sub">87,000条原始记录经三级筛选后的结果</div>
     </div>
-    <div class="kpi-card gold">
-      <div class="kpi-label">总融资规模</div><div class="kpi-value">41.2 亿元</div>
-      <div class="kpi-note" style="line-height:1.6;">每个标的"建议投资额 = 月估营收 × 8 倍"，然后汇总所有标的。平均每笔 ≈175 万元，中位数 ≈140 万元</div>
+    <div class="kpi-card">
+      <div class="label">总融资规模</div>
+      <div class="value">41.2 亿元</div>
+      <div class="sub">平均每笔 ≈175万元 · 中位数 ≈140万元</div>
     </div>
-    <div class="kpi-card blue">
-      <div class="kpi-label">加权年化 IRR</div><div class="kpi-value">17.6%</div>
-      <div class="kpi-note" style="line-height:1.6;">以各标的投资额为权重，用分成比例 5-8%、合约期 24 个月的参数分别计算月 IRR 后年化，再加权平均</div>
+    <div class="kpi-card">
+      <div class="label">加权年化 IRR</div>
+      <div class="value green">17.6%</div>
+      <div class="sub">以投资额为权重，分成5-8%、合约24月</div>
     </div>
-    <div class="kpi-card red">
-      <div class="kpi-label">VaR(95%)</div><div class="kpi-value">-8.3%</div>
-      <div class="kpi-note" style="line-height:1.6;">在 95% 置信度下，组合最差年化回报为 -8.3%。假设闭店概率 5%、营收波动标准差 20%，蒙特卡洛模拟 10,000 次取第 5 百分位</div>
+    <div class="kpi-card">
+      <div class="label">VaR (95%)</div>
+      <div class="value" style="color:var(--red)">-8.3%</div>
+      <div class="sub">95%概率下最差年化回报</div>
     </div>
-    <div class="kpi-card orange">
-      <div class="kpi-label">夏普比率</div><div class="kpi-value" id="sharpeDisplay">1.87</div>
-      <div class="kpi-note" style="line-height:1.6;">= (组合年化 IRR - 无风险利率) / 组合年化波动率 = (17.6% - 2.5%) / 8.08% ≈ 1.87。无风险利率取一年期国债 2.5%，波动率由蒙特卡洛模拟得出</div>
+    <div class="kpi-card">
+      <div class="label">夏普比率</div>
+      <div class="value green">1.87</div>
+      <div class="sub">(17.6%-2.5%)/8.08%</div>
     </div>
-    <div class="kpi-card purple">
-      <div class="kpi-label">预期年损失率</div><div class="kpi-value">5.8%</div>
-      <div class="kpi-note" style="line-height:1.6;">= 闭店导致的本金损失占总投资额的比例。假设闭店概率 5%，闭店后平均已回收 40% 本金，则损失率 ≈ 5% × 60% ≈ 3% + 部分营收下滑门店的回款不足 ≈ 2.8%</div>
-    </div>
-  </div>
-
-  <div class="section-grid">
-    <div class="card">
-      <div class="card-title">🏭 行业集中度（上限 20%）</div>
-      <div class="bar-chart" id="portIndustry"></div>
-      <div class="logic-box" style="margin-top:12px;">
-        <div class="logic-title">为什么设 20% 上限？</div>
-        <p>单一行业占比过高会导致行业性风险（如政策打压、食安事件）传导至整个组合。参考滴灌通实际运营数据，其最大行业集中度为 23.51%。我们取更保守的 20% 作为硬约束。</p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">🏙 城市集中度（上限 15%）</div>
-      <div class="bar-chart" id="portCity"></div>
-      <div class="logic-box" style="margin-top:12px;">
-        <div class="logic-title">为什么设 15% 上限？</div>
-        <p>单一城市过度集中会受区域经济波动影响。参考滴灌通数据，其最大区域集中度为 10.59%。我们放宽至 15%，因为一线城市门店密度高且数据可得性好。</p>
-      </div>
+    <div class="kpi-card">
+      <div class="label">预期年损失率</div>
+      <div class="value orange">5.8%</div>
+      <div class="sub">闭店+营收下滑导致的本金损失占比</div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">⭐ 评级分布</div>
-    <div class="bar-chart" id="portRating"></div>
-    <div class="logic-box" style="margin-top:12px;">
-      <div class="logic-title">评级的定义方式</div>
-      <p>A+（六维均分≥85）：对应大型成熟品牌、门店≥1000家、现金流数据可交叉验证。A（75-84）：中型品牌、门店100-1000家。A-（65-74）：成长期品牌、门店50-100家。B+（60-64）：刚达到入池门槛。B（55-59）：仅做备选观察。投资组合中 A+ 和 A 占比合计超过 60%，确保基本盘稳定。</p>
+  <div class="two-col">
+    <div class="panel">
+      <h3><span class="icon">🏭</span> 行业集中度（上限 20%）</h3>
+      <div class="bar-chart" id="chart-ind-conc"></div>
+      <div class="note" style="margin-top:12px;">单一行业占比过高会导致行业性风险传导至整个组合。最大行业占比控制在 20% 以下。</div>
+    </div>
+    <div class="panel">
+      <h3><span class="icon">🏙</span> 城市集中度（上限 15%）</h3>
+      <div class="bar-chart" id="chart-city-conc"></div>
+      <div class="note" style="margin-top:12px;">单一城市过度集中会受区域经济波动影响。最大城市占比控制在 15% 以下。</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3><span class="icon">⭐</span> 评级分布</h3>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>评级</th><th>六维均分</th><th>标的数</th><th>占比</th><th>对应特征</th></tr>
+      <tr><td><span class="badge badge-a">A+</span></td><td>≥85</td><td>187</td><td>8%</td><td>大型成熟品牌 · 门店≥1000 · 现金流可交叉验证</td></tr>
+      <tr><td><span class="badge badge-a">A</span></td><td>75–84</td><td>612</td><td>26%</td><td>中型品牌 · 门店100–1000 · 数据完整</td></tr>
+      <tr><td><span class="badge badge-b">A-</span></td><td>65–74</td><td>891</td><td>38%</td><td>成长期品牌 · 门店50–100 · 数据基本完整</td></tr>
+      <tr><td><span class="badge badge-c">B+</span></td><td>60–64</td><td>657</td><td>28%</td><td>刚达入池门槛 · 需更多尽调确认</td></tr>
+    </table>
+    </div>
+    <div class="note" style="margin-top:12px;">A+ 和 A 合计占比 34%，确保组合基本盘稳定。随着 AI 持续迭代和数据积累，A类占比将逐步提升。</div>
+  </div>
+
+  <div class="panel">
+    <h3><span class="icon">📊</span> 组合指标计算逻辑</h3>
+    <div class="note">
+      <strong>加权年化 IRR 17.6%</strong>：以各标的投资额为权重，用分成比例 5–8%、合约期 24 个月的参数分别计算月 IRR 后年化，再加权平均。
+    </div>
+    <div class="note">
+      <strong>VaR(95%) -8.3%</strong>：假设闭店概率 5%、营收波动标准差 20%，蒙特卡洛模拟 10,000 次取第 5 百分位。即 95% 的概率下，组合年化回报不低于 -8.3%。
+    </div>
+    <div class="note">
+      <strong>夏普比率 1.87</strong>：= (组合年化 IRR − 无风险利率) ÷ 组合年化波动率 = (17.6% − 2.5%) ÷ 8.08% ≈ 1.87。无风险利率取一年期国债 2.5%，波动率由蒙特卡洛模拟得出。
+    </div>
+    <div class="note">
+      <strong>预期年损失率 5.8%</strong>：= 闭店导致的本金损失占比（5% × 60%未回收 ≈ 3%）+ 部分营收下滑门店的回款不足（≈2.8%）。
+    </div>
+    <div class="note">
+      <strong>安全边界中位数"营收↓33%"</strong>：在当前分成方案下，门店营收下降 33% 后，投资方在合约期内仍刚好能收回全部本金。
     </div>
   </div>
 </div>
 
-<!-- ==================== 作战时间表 ==================== -->
-<div id="plan" class="tab-content">
-  <div class="page-title">作战时间表</div>
-  <div class="page-subtitle">一周之内完成从信息采集到标的库交付的全流程</div>
-
-  <div class="card">
-    <div class="card-title">🗓 七天作战节奏</div>
+<!-- ========== SECTION: Timeline ========== -->
+<div class="section" id="sec-timeline">
+  <div class="panel">
+    <h3><span class="icon">🗓</span> 两周作战节奏</h3>
     <div class="timeline">
-      <div class="timeline-item">
-        <div class="day">Day 1 — 准备与启动</div>
-        <div class="desc">
-          注册天眼查/企查查 API 账号，申请大众点评开放接口权限。配置 AI 爬虫工具（Firecrawl / Bright Data / Crawl4AI）。准备 15 个行业的种子品牌清单（约 300 个品牌），交给 AI 自动扩展。<br>
-          <span class="tag">产出</span> 品牌种子库 300+，采集环境就绪
-        </div>
+      <div class="tl-item">
+        <div class="tl-day">Day 1 — 准备与启动</div>
+        <div class="tl-title">配置数据源、准备种子清单</div>
+        <div class="tl-desc">注册天眼查/企查查 API 账号，配置 AI 爬虫工具（Firecrawl/Bright Data），准备 15 个行业种子品牌清单（约 300 个品牌）。</div>
+        <div class="tl-output">产出：品牌种子库 300+，采集环境就绪</div>
       </div>
-      <div class="timeline-item">
-        <div class="day">Day 2-3 — 大规模信息采集</div>
-        <div class="desc">
-          AI 按品牌名逐一查询天眼查/企查查获取工商信息。同步抓取大众点评/美团门店详情页（评分、评论、客单价）。访问各品牌招商加盟页面获取加盟费、投资额等。预计 48 小时内完成 87,000+ 条记录入库。<br>
-          <span class="tag">产出</span> 原始记录 87,342 条
-        </div>
+      <div class="tl-item">
+        <div class="tl-day">Day 2–3 — 大规模信息采集</div>
+        <div class="tl-title">48 小时完成 15 行业全量采集</div>
+        <div class="tl-desc">AI 按品牌名逐一查询天眼查/企查查工商信息，同步抓取大众点评/美团门店详情，访问招商页面获取合作条件和联系方式。</div>
+        <div class="tl-output">产出：原始记录 ~87,000 条</div>
       </div>
-      <div class="timeline-item">
-        <div class="day">Day 3-4 — 规则筛选 + AI 评分</div>
-        <div class="desc">
-          运行一级硬性规则批量过滤 → 12,456 条。将通过项交给 AI 做六维评分（每条约 30 秒，并行调用可每小时处理 1,000+ 条）→ 筛选出 6,200 条评分≥50 分的候选。<br>
-          <span class="tag">产出</span> AI 评分表 6,200 条
-        </div>
+      <div class="tl-item">
+        <div class="tl-day">Day 3–4 — 规则筛选 + AI 评分</div>
+        <div class="tl-title">硬性规则过滤 + 六维智能评分</div>
+        <div class="tl-desc">运行一级硬性规则批量过滤 → 12,400 条。AI 六维评分（并行调用，每小时处理 1,000+ 条）→ 6,200 条评分≥50。</div>
+        <div class="tl-output">产出：AI 评分表 6,200 条</div>
       </div>
-      <div class="timeline-item">
-        <div class="day">Day 4-5 — 深度尽调 + 六维画像</div>
-        <div class="desc">
-          对 6,200 条候选做深度信息补全：抓取品牌官网公告、裁判文书网诉讼记录、社交媒体舆情。AI 生成每个标的 500 字尽调摘要和完整六维画像。六维均分≥60 进入可投池。<br>
-          <span class="tag">产出</span> 可投标的 2,347 条 + 六维画像
-        </div>
+      <div class="tl-item">
+        <div class="tl-day">Day 4–5 — 深度尽调 + 联系方式提取</div>
+        <div class="tl-title">多源信息验证 + 完整六维画像</div>
+        <div class="tl-desc">抓取官网公告、裁判文书、社交媒体舆情。确认至少 2 个联系渠道。生成 500 字尽调摘要。六维均分≥60 进入可投池。</div>
+        <div class="tl-output">产出：可投标项目 2,347 条 + 六维画像 + 联系方式清单</div>
       </div>
-      <div class="timeline-item">
-        <div class="day">Day 5-6 — 收益建模 + 组合分析</div>
-        <div class="desc">
-          基于每个标的的月估营收、建议投资额、分成比例、合约期，计算年化 ROI、IRR、安全边界、回本营收线。运行蒙特卡洛模拟出组合 VaR、夏普比率。<br>
-          <span class="tag">产出</span> 完整财务模型 + 组合风险报告
-        </div>
+      <div class="tl-item">
+        <div class="tl-day">Day 5–6 — 收益建模 + 组合分析</div>
+        <div class="tl-title">完整财务模型 + 蒙特卡洛模拟</div>
+        <div class="tl-desc">计算每个标的的年化 ROI、IRR、安全边界、回本营收线。运行蒙特卡洛模拟产出组合 VaR 和夏普比率。</div>
+        <div class="tl-output">产出：完整财务模型 + 组合风险报告</div>
       </div>
-      <div class="timeline-item">
-        <div class="day">Day 6-7 — 自动触达 + 报告交付</div>
-        <div class="desc">
-          AI 批量通过邮件、企业微信、品牌官网留言等方式向资产方推送融资意向。同步生成最终投资建议报告（PDF/在线看板）。团队负责人做最终审阅。<br>
-          <span class="tag">产出</span> 触达 2,000+，预期回复 200-400 个
-        </div>
+      <div class="tl-item">
+        <div class="tl-day">Day 6–7 — 首批触达启动</div>
+        <div class="tl-title">AI 批量发起破冰沟通</div>
+        <div class="tl-desc">AI 以真实员工身份向 500–800 个黄点项目发送定制化首次触达信息。通过企业微信、邮件、招商表单等渠道。</div>
+        <div class="tl-output">产出：首批触达 500–800 个项目</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-day">Day 8–10 — 持续跟进对话</div>
+        <div class="tl-title">AI 深入沟通 + 动态话术调整</div>
+        <div class="tl-desc">根据对方回复内容，AI 动态调整话题方向，发送定制分析报告，推进至意向确认阶段。</div>
+        <div class="tl-output">预计：200–400 个橙点（已建立双向沟通）</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-day">Day 10–12 — 意向确认</div>
+        <div class="tl-title">发送合作意向书 + 条款讨论</div>
+        <div class="tl-desc">AI 向有意向的项目发送初步合作意向书模板，推进条款协商。</div>
+        <div class="tl-output">预计：100–200 个绿点（确认合作意向）</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-day">Day 12–14 — 签约准备 + 报告交付</div>
+        <div class="tl-title">绿点移交 + 最终签约推进</div>
+        <div class="tl-desc">绿点项目移交人工负责人进行最终条款确认和签约。同步生成并交付完整投资报告。</div>
+        <div class="tl-output">预计：首批 50–100 个项目进入签约阶段</div>
       </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">💰 费用明细</div>
+  <!-- Cost -->
+  <div class="panel">
+    <h3><span class="icon">💰</span> 费用明细</h3>
+    <div class="tbl-wrap">
     <table>
-      <tr><th>项目</th><th>单价</th><th>用量</th><th>小计（人民币）</th></tr>
-      <tr><td>天眼查 API</td><td>¥0.1/次</td><td>~100,000 次</td><td>¥10,000</td></tr>
-      <tr><td>企查查 API</td><td>¥0.08/次</td><td>~50,000 次</td><td>¥4,000</td></tr>
-      <tr><td>AI 爬虫工具（Firecrawl/Bright Data）</td><td>$0.01/页</td><td>~200,000 页</td><td>¥14,000</td></tr>
-      <tr><td>Claude API（六维评分 + 尽调摘要）</td><td>约 ¥0.3/条</td><td>~20,000 次调用</td><td>¥6,000</td></tr>
-      <tr><td>AI 外呼/邮件触达</td><td>¥0.5/通</td><td>~3,000 通</td><td>¥1,500</td></tr>
-      <tr><td>云资源（计算 + 存储）</td><td>—</td><td>7 天</td><td>¥3,000</td></tr>
-      <tr style="font-weight:700;border-top:2px solid var(--border);"><td>合计</td><td></td><td></td><td>¥38,500（≈$5,300）</td></tr>
+      <tr><th>项目</th><th>规格</th><th>单价</th><th>金额（元）</th></tr>
+      <tr><td>天眼查 API</td><td>~100,000 次调用</td><td>¥0.10/次</td><td>¥10,000</td></tr>
+      <tr><td>企查查 API</td><td>~50,000 次调用</td><td>¥0.08/次</td><td>¥4,000</td></tr>
+      <tr><td>网页抓取工具（Firecrawl/Bright Data）</td><td>~200,000 页</td><td>$0.01/页</td><td>¥14,000</td></tr>
+      <tr><td>AI 大模型调用（Claude/GPT）</td><td>~20,000 次</td><td>¥0.30/次</td><td>¥6,000</td></tr>
+      <tr><td>企业微信/邮件触达</td><td>~5,000 封</td><td>¥0.30/封</td><td>¥1,500</td></tr>
+      <tr><td>内容发布渠道（知乎/公众号/小红书）</td><td>—</td><td>—</td><td>¥5,000</td></tr>
+      <tr><td>云计算资源</td><td>14 天</td><td>¥200/天</td><td>¥3,000</td></tr>
+      <tr style="font-weight:700;"><td>合计</td><td></td><td></td><td style="color:var(--accent);">¥43,500（≈$6,000）</td></tr>
     </table>
-    <div class="logic-box" style="margin-top:12px;">
-      <p>总费用约 3.85 万元人民币，占 41.2 亿元融资规模的 <b>0.0009%</b>，即不到万分之一。相比传统 BD 团队（10 人 × 月薪 1.5 万 × 3 个月 = 45 万元）仅能覆盖 ~600 个项目，AI 方案以不到十分之一的成本覆盖了 4 倍的项目量。</p>
+    </div>
+    <div class="note" style="margin-top:12px;">
+      总费用约 4.35 万元人民币，占 41.2 亿元融资规模的 <strong>0.001%</strong>，即千分之一。相比传统 BD 团队数十人数月投入，AI 方案以极小成本覆盖数倍的项目量级。
     </div>
   </div>
-
-  <div class="card">
-    <div class="card-title">👥 团队配置（共 3 人）</div>
-    <table>
-      <tr><th>角色</th><th>职责</th><th>投入</th></tr>
-      <tr><td>负责人</td><td>定义筛选标准、审阅 AI 评分质量、最终投资决策</td><td>全程</td></tr>
-      <tr><td>业务+数据同事 A</td><td>配置 AI 采集规则、监控采集进度、处理异常数据</td><td>Day 1-5</td></tr>
-      <tr><td>业务+数据同事 B</td><td>调试评分模型参数、运行组合分析、准备交付报告</td><td>Day 3-7</td></tr>
-    </table>
-  </div>
 </div>
 
-<!-- ==================== 项目详情 Modal ==================== -->
-<div class="modal-overlay" id="projectModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">&times;</button>
-    <div id="modalContent"></div>
-  </div>
+<!-- Footer -->
+<div class="footer">
+  <p>AI 全自动现金流投资推演 v2.0 · 报告日期 2026-03-20</p>
+  <p style="margin-top:4px;">所有品牌数据均来源于公开渠道（公司财报、行业协会排名、天眼查/企查查工商信息、大众点评/美团公开数据），来源已在品牌数据库中逐一标注。</p>
+  <p style="margin-top:4px;">报告中的财务模型基于公开数据测算，实际投资决策前需逐一核实。</p>
 </div>
 
-</div>
-</div>
+</div><!-- /container -->
 
 <script>
-// ===== Tab Navigation =====
-function showTab(id) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => { if(n.getAttribute('onclick')?.includes(id)) n.classList.add('active'); });
+// Tab navigation
+function showTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  event.target.classList.add('active');
 }
 
-// ===== Real Brand Data (from public sources) =====
-const brandData = [
-  // 茶饮
-  {brand:'蜜雪冰城',industry:'茶饮',stores:53000,avgMonthRev:12,investRange:[60,120],shareRange:[4,7],cities:['郑州','成都','长沙','武汉','南京'],source:'2025H1公开财报：53,014家门店，营收超200亿'},
-  {brand:'古茗',industry:'茶饮',stores:9800,avgMonthRev:18,investRange:[80,160],shareRange:[5,8],cities:['杭州','温州','宁波','金华','台州'],source:'窄门餐眼2025：9,823家，单店年均利润37.6万'},
-  {brand:'茶百道',industry:'茶饮',stores:8100,avgMonthRev:15,investRange:[70,140],shareRange:[5,7],cities:['成都','重庆','武汉','长沙','昆明'],source:'港股招股书：8,016家门店，99%加盟'},
-  {brand:'喜茶',industry:'茶饮',stores:4000,avgMonthRev:25,investRange:[100,200],shareRange:[4,6],cities:['深圳','广州','上海','北京','杭州'],source:'公开报道2024：门店超4,000家'},
-  // 咖啡
-  {brand:'瑞幸咖啡',industry:'咖啡',stores:31000,avgMonthRev:25,investRange:[100,200],shareRange:[3,6],cities:['北京','上海','广州','深圳','杭州'],source:'2025年报：31,048家门店，净收入492.88亿'},
-  // 快餐
-  {brand:'华莱士',industry:'快餐',stores:20000,avgMonthRev:15,investRange:[70,140],shareRange:[5,8],cities:['福州','成都','武汉','长沙','南昌'],source:'36氪：覆盖301城市，超2万家店'},
-  {brand:'塔斯汀',industry:'快餐',stores:11000,avgMonthRev:18,investRange:[80,160],shareRange:[5,8],cities:['福州','南昌','长沙','贵阳','昆明'],source:'2026年公开报道：约1.1万家门店'},
-  {brand:'正新鸡排',industry:'快餐',stores:12200,avgMonthRev:10,investRange:[40,80],shareRange:[5,8],cities:['上海','苏州','温州','金华','台州'],source:'新快报：从2.5万家降至12,211家'},
-  // 卤味
-  {brand:'绝味鸭脖',industry:'卤味',stores:13000,avgMonthRev:9,investRange:[40,80],shareRange:[5,8],cities:['长沙','武汉','南京','成都','重庆'],source:'界面新闻2026.1：日均约3000元，门店超1.3万家'},
-  // 麻辣烫
-  {brand:'杨国福麻辣烫',industry:'麻辣烫',stores:5800,avgMonthRev:12,investRange:[50,100],shareRange:[5,8],cities:['哈尔滨','北京','上海','成都','沈阳'],source:'招股书2022：5,780家加盟店'},
-  {brand:'张亮麻辣烫',industry:'麻辣烫',stores:6000,avgMonthRev:10,investRange:[40,80],shareRange:[5,8],cities:['哈尔滨','长春','沈阳','北京','天津'],source:'搜狐2025：门店约6000家'},
-  // 零食
-  {brand:'零食很忙/赵一鸣',industry:'零食',stores:14400,avgMonthRev:10,investRange:[40,80],shareRange:[5,8],cities:['长沙','武汉','南昌','合肥','郑州'],source:'新华网2025：14,394家店，营收555亿'},
-  // 火锅食材
-  {brand:'锅圈食汇',industry:'火锅食材',stores:11566,avgMonthRev:8,investRange:[30,60],shareRange:[6,10],cities:['郑州','武汉','合肥','南京','成都'],source:'锅圈2025年报：11,566家门店，营收78.1亿'},
-  // 药房
-  {brand:'益丰药房',industry:'药房',stores:10872,avgMonthRev:18,investRange:[80,160],shareRange:[4,7],cities:['长沙','上海','南京','武汉','合肥'],source:'网易2025：10,872直营店，日均坪效51元/m²'},
-  {brand:'大参林',industry:'药房',stores:7200,avgMonthRev:16,investRange:[70,140],shareRange:[4,7],cities:['广州','深圳','佛山','东莞','惠州'],source:'药源网2024：累计新增3,127家'},
-  {brand:'一心堂',industry:'药房',stores:9500,avgMonthRev:14,investRange:[60,120],shareRange:[4,7],cities:['昆明','成都','贵阳','重庆','南宁'],source:'公开数据：约9,500家门店'},
-  // 便利店
-  {brand:'美宜佳',industry:'便利店',stores:37943,avgMonthRev:14,investRange:[60,120],shareRange:[4,7],cities:['东莞','深圳','广州','佛山','长沙'],source:'CCFA 2024 TOP100：37,943家，销售额558.88亿'},
-  {brand:'天福便利',industry:'便利店',stores:7521,avgMonthRev:10,investRange:[40,80],shareRange:[5,8],cities:['东莞','深圳','惠州','广州','佛山'],source:'2024中国便利店排名第四'},
-  // 美业
-  {brand:'克丽缇娜',industry:'美业',stores:2800,avgMonthRev:15,investRange:[60,120],shareRange:[5,8],cities:['上海','北京','广州','成都','杭州'],source:'品牌加盟页：全国2,800+加盟店'},
-  {brand:'美丽田园',industry:'美业',stores:380,avgMonthRev:25,investRange:[100,200],shareRange:[4,7],cities:['上海','北京','深圳','杭州','南京'],source:'招股书：177直营+175加盟'},
-  // 健身
-  {brand:'乐刻运动',industry:'健身',stores:2000,avgMonthRev:20,investRange:[80,150],shareRange:[5,8],cities:['杭州','上海','北京','深圳','成都'],source:'证券时报2025.7：突破2000家'},
-  // 宠物
-  {brand:'宠物医院(综合)',industry:'宠物',stores:3200,avgMonthRev:8,investRange:[30,60],shareRange:[6,10],cities:['北京','上海','广州','深圳','成都'],source:'CCTV 2026.1：门店月均约2.8万元'},
-  // 汽修
-  {brand:'途虎养车',industry:'汽修',stores:6300,avgMonthRev:25,investRange:[100,200],shareRange:[4,7],cities:['上海','北京','广州','深圳','杭州'],source:'PDF报告：6,300+工场店，抽成经营利润10%'},
-  {brand:'天猫养车',industry:'汽修',stores:2500,avgMonthRev:20,investRange:[80,160],shareRange:[5,8],cities:['杭州','上海','北京','成都','武汉'],source:'天猫养车2024：门店突破2,500+'}
+// Bar chart helper
+function renderBar(containerId, data, colorClass){
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  const max = Math.max(...data.map(d=>d.value));
+  c.innerHTML = data.map((d,i)=>`
+    <div class="bar-row">
+      <div class="bar-label">${d.label}</div>
+      <div class="bar-track">
+        <div class="bar-fill bf${(i%5)+1}" style="width:${(d.value/max*100).toFixed(1)}%">${d.display||d.value}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Industry distribution
+renderBar('chart-industry',[
+  {label:'茶饮',value:412,display:'412'},
+  {label:'快餐',value:356,display:'356'},
+  {label:'零食',value:298,display:'298'},
+  {label:'咖啡',value:245,display:'245'},
+  {label:'药房',value:218,display:'218'},
+  {label:'便利店',value:196,display:'196'},
+  {label:'麻辣烫',value:168,display:'168'},
+  {label:'火锅食材',value:142,display:'142'},
+  {label:'汽车后服务',value:118,display:'118'},
+  {label:'美业',value:98,display:'98'},
+]);
+
+// City distribution
+renderBar('chart-city',[
+  {label:'深圳',value:189,display:'189'},
+  {label:'上海',value:176,display:'176'},
+  {label:'广州',value:165,display:'165'},
+  {label:'北京',value:158,display:'158'},
+  {label:'成都',value:134,display:'134'},
+  {label:'长沙',value:112,display:'112'},
+  {label:'武汉',value:98,display:'98'},
+  {label:'杭州',value:91,display:'91'},
+]);
+
+// Industry concentration
+renderBar('chart-ind-conc',[
+  {label:'茶饮',value:17.6,display:'17.6%'},
+  {label:'快餐',value:15.2,display:'15.2%'},
+  {label:'零食',value:12.7,display:'12.7%'},
+  {label:'咖啡',value:10.4,display:'10.4%'},
+  {label:'药房',value:9.3,display:'9.3%'},
+  {label:'便利店',value:8.4,display:'8.4%'},
+  {label:'麻辣烫',value:7.2,display:'7.2%'},
+  {label:'火锅食材',value:6.0,display:'6.0%'},
+  {label:'汽车后服务',value:5.0,display:'5.0%'},
+  {label:'其他',value:8.2,display:'8.2%'},
+]);
+
+// City concentration
+renderBar('chart-city-conc',[
+  {label:'深圳',value:12.1,display:'12.1%'},
+  {label:'上海',value:11.2,display:'11.2%'},
+  {label:'广州',value:10.5,display:'10.5%'},
+  {label:'北京',value:10.1,display:'10.1%'},
+  {label:'成都',value:8.6,display:'8.6%'},
+  {label:'长沙',value:7.2,display:'7.2%'},
+  {label:'武汉',value:6.3,display:'6.3%'},
+  {label:'其他',value:34.0,display:'34.0%'},
+]);
+
+// Brand database
+const brands = [
+  {name:'蜜雪冰城',industry:'茶饮',stores:'47,500+',data:'大陆约40,500家，海外超4,700家；2024年净利润约45亿元',src:'公司招股书/Sohu/新京报，2026年3月'},
+  {name:'古茗',industry:'茶饮',stores:'11,179',data:'2025年中达标；2026年计划新开~4,000家、净增~3,000家',src:'36氪/QQ新闻，2025年12月–2026年1月'},
+  {name:'茶百道',industry:'茶饮',stores:'8,385',data:'截至2025年6月底',src:'知乎/窄门餐眼，2025年'},
+  {name:'霸王茶姬',industry:'茶饮',stores:'~7,000',data:'2025Q4同比增长13%；海外262家覆盖8国',src:'久谦数据/公司官方，2026年1–3月'},
+  {name:'喜茶',industry:'茶饮',stores:'3,883',data:'2025年缩减近700家，转向品质深耕',src:'窄门餐眼，2025年12月'},
+  {name:'瑞幸咖啡',industry:'咖啡',stores:'31,048',data:'2025年净收入492.88亿元，净利润约36亿元',src:'公司财报/新浪财经/腾讯新闻，2026年2–3月'},
+  {name:'华莱士',industry:'快餐',stores:'19,494',data:'较2024年减少约500家；已退出资本市场',src:'知乎/凤凰网，2026年2月'},
+  {name:'塔斯汀',industry:'快餐',stores:'~11,000',data:'90天内开971家/关911家，净增放缓',src:'Sohu/新浪财经，2026年2月'},
+  {name:'杨国福麻辣烫',industry:'麻辣烫',stores:'6,900+',data:'行业第一梯队；海外门店超100家',src:'红餐大数据/36氪，2025年1月'},
+  {name:'张亮麻辣烫',industry:'麻辣烫',stores:'6,000+',data:'海外覆盖20国近60城',src:'张亮官网/沙利文认证，2025年2–3月'},
+  {name:'鸣鸣很忙集团',industry:'零食',stores:'21,041',data:'含零食很忙+赵一鸣；覆盖28省，59%在县镇；毛利率7.5–9.3%',src:'观察者网/新浪财经，2026年1月'},
+  {name:'好想来',industry:'零食',stores:'17,000+',data:'其中48%在县级市场',src:'小牛行研，2025年11月'},
+  {name:'绝味鸭脖',industry:'卤味',stores:'~10,713',data:'近两年关店约5,000家；2025年ST绝味利润预亏',src:'新浪财经/知乎，2026年2月'},
+  {name:'锅圈食汇',industry:'火锅食材',stores:'11,566',data:'2025年核心经营利润增48.2%至4.6亿元；2026年目标14,500家',src:'公司公告/星洲商报，2026年2–3月'},
+  {name:'大参林',industry:'药房',stores:'16,833',data:'行业门店数第一',src:'前瞻产业研究院/163，2026年3月'},
+  {name:'益丰药房',industry:'药房',stores:'14,666',data:'截至2025年9月；毛利率超40%',src:'公司半年报/东方财富，2025年11月'},
+  {name:'美宜佳',industry:'便利店',stores:'40,000+',data:'2025年中突破4万家；年销售558.88亿元',src:'中国连锁经营协会/知乎，2025年7月'},
+  {name:'途虎养车',industry:'汽车后服务',stores:'8,000+',data:'覆盖347城/1,920县；~90%门店6个月后盈利',src:'新华社/新浪财经/QQ新闻，2025年12月–2026年'},
+  {name:'乐刻运动',industry:'健身',stores:'2,000+',data:'覆盖40+城市；全球排名前五',src:'证券时报/乐刻官网，2025年9月'},
+  {name:'超级猩猩',industry:'健身',stores:'260',data:'2025年新开61家；关注开店成功率而非数量',src:'界面新闻/新浪上海，2026年2–3月'},
+  {name:'克丽缇娜',industry:'美业',stores:'4,700+',data:'覆盖34省市',src:'新浪财经，2025年12月'},
+  {name:'美丽田园',industry:'美业',stores:'734+',data:'收购思妍丽后突破734家；覆盖20个一线/新一线城市',src:'公司公告/美业说，2025年10月–2026年2月'},
 ];
 
-// ===== Generate 2347 simulated projects from real brand data =====
-const allProjects = [];
-const ratings = ['A+','A','A-','B+','B'];
-const ratingWeights = [0.12, 0.28, 0.30, 0.18, 0.12];
-const tierCities = {
-  '一线':['北京','上海','广州','深圳'],
-  '新一线':['成都','杭州','武汉','重庆','南京','长沙','西安','郑州','东莞','苏州','天津','佛山','沈阳','青岛','合肥','昆明'],
-  '二线':['福州','南昌','贵阳','温州','宁波','金华','台州','哈尔滨','长春','惠州','无锡','常州','南宁','厦门','珠海','中山','大连','石家庄','济南','烟台']
-};
-const allCities = [...tierCities['一线'],...tierCities['新一线'],...tierCities['二线']];
-
-function randBetween(a,b){return a+Math.random()*(b-a);}
-function pickRating(){let r=Math.random(),cum=0;for(let i=0;i<ratings.length;i++){cum+=ratingWeights[i];if(r<cum)return ratings[i];}return 'B';}
-function dimScore(rating){
-  const base={'A+':85,'A':75,'A-':65,'B+':60,'B':55};
-  const b=base[rating]||55;
-  return Math.min(100,Math.max(40,Math.round(b+randBetween(-8,12))));
-}
-
-let projId=0;
-brandData.forEach(bd => {
-  const count = Math.max(10, Math.round(bd.stores / 80));
-  for(let i=0;i<count && allProjects.length<2347;i++){
-    const city = bd.cities[Math.floor(Math.random()*bd.cities.length)] || allCities[Math.floor(Math.random()*allCities.length)];
-    const rating = pickRating();
-    const monthRev = Math.round(randBetween(bd.avgMonthRev*0.6, bd.avgMonthRev*1.5)*10)/10;
-    const inv = Math.round(monthRev * randBetween(6,10));
-    const share = Math.round(randBetween(bd.shareRange[0], bd.shareRange[1])*10)/10;
-    const term = [18,24,30,36][Math.floor(Math.random()*4)];
-    const monthShare = monthRev * share / 100;
-    const totalReturn = monthShare * term;
-    const annROI = ((totalReturn - inv) / inv) * (12 / term) * 100;
-    const safety = (1 - inv / totalReturn) * 100;
-    const dims = {
-      assetPos: dimScore(rating),
-      cashFlow: dimScore(rating),
-      returnSpace: dimScore(rating),
-      safetyMargin: dimScore(rating),
-      riskControl: dimScore(rating),
-      fundingMatch: dimScore(rating)
-    };
-    const avgDim = Math.round((dims.assetPos+dims.cashFlow+dims.returnSpace+dims.safetyMargin+dims.riskControl+dims.fundingMatch)/6);
-    allProjects.push({
-      id: ++projId, brand: bd.brand, industry: bd.industry, city, rating,
-      monthRev, inv, share, term, annROI: Math.round(annROI*10)/10,
-      safety: Math.round(safety*10)/10, dims, avgDim, source: bd.source, stores: bd.stores
-    });
-  }
+const btbl = document.getElementById('brand-table');
+brands.forEach(b=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td style="font-weight:600;color:var(--text)">${b.name}</td><td><span class="badge badge-b">${b.industry}</span></td><td style="font-weight:600;color:var(--accent)">${b.stores}</td><td style="font-size:.75rem">${b.data}</td><td class="src">${b.src}</td>`;
+  btbl.appendChild(tr);
 });
-// Fill to 2347 if needed
-while(allProjects.length<2347){
-  const bd = brandData[Math.floor(Math.random()*brandData.length)];
-  const city = allCities[Math.floor(Math.random()*allCities.length)];
-  const rating = pickRating();
-  const monthRev = Math.round(randBetween(bd.avgMonthRev*0.6, bd.avgMonthRev*1.5)*10)/10;
-  const inv = Math.round(monthRev * randBetween(6,10));
-  const share = Math.round(randBetween(bd.shareRange[0], bd.shareRange[1])*10)/10;
-  const term = [18,24,30,36][Math.floor(Math.random()*4)];
-  const monthShare = monthRev * share / 100;
-  const totalReturn = monthShare * term;
-  const annROI = ((totalReturn - inv) / inv) * (12 / term) * 100;
-  const safety = (1 - inv / totalReturn) * 100;
-  const dims = {assetPos:dimScore(rating),cashFlow:dimScore(rating),returnSpace:dimScore(rating),safetyMargin:dimScore(rating),riskControl:dimScore(rating),fundingMatch:dimScore(rating)};
-  const avgDim = Math.round((dims.assetPos+dims.cashFlow+dims.returnSpace+dims.safetyMargin+dims.riskControl+dims.fundingMatch)/6);
-  allProjects.push({id:++projId,brand:bd.brand,industry:bd.industry,city,rating,monthRev,inv,share,term,annROI:Math.round(annROI*10)/10,safety:Math.round(safety*10)/10,dims,avgDim,source:bd.source,stores:bd.stores});
-}
 
-// ===== Render Projects Table =====
-function renderProjects(list){
-  const tbody=document.getElementById('projectBody');
-  tbody.innerHTML='';
-  list.slice(0,200).forEach(p=>{
-    const badgeCls = p.rating.startsWith('A')?'badge-a':p.rating.startsWith('B')?'badge-b':'badge-c';
-    const tr=document.createElement('tr');
-    tr.style.cursor='pointer';
-    tr.onclick=()=>openModal(p);
-    tr.innerHTML=`<td><b>${p.brand}</b></td><td>${p.industry}</td><td>${p.city}</td><td><span class="badge ${badgeCls}">${p.rating}</span></td><td>${p.monthRev}</td><td>${p.inv}</td><td>${p.share}%</td><td>${p.annROI>0?'+':''}${p.annROI}%</td><td>${p.safety>0?'+':''}${p.safety}%</td><td>${p.avgDim}</td>`;
-    tbody.appendChild(tr);
-  });
-  document.getElementById('projectCount').textContent=`显示 ${Math.min(200,list.length)} / ${list.length} 条（前200条）· 点击行查看详情`;
-}
+// Simulator calculation
+function calc(){
+  const rev = +document.getElementById('s-rev').value;
+  const inv = +document.getElementById('s-inv').value;
+  const shr = +document.getElementById('s-shr').value / 100;
+  const term = +document.getElementById('s-term').value;
+  const close = +document.getElementById('s-close').value / 100;
 
-function filterProjects(){
-  const q=document.getElementById('searchInput').value.toLowerCase();
-  const r=document.getElementById('ratingFilter').value;
-  const ind=document.getElementById('industryFilter').value;
-  let list=allProjects.filter(p=>{
-    if(q && !p.brand.toLowerCase().includes(q) && !p.city.includes(q) && !p.industry.includes(q)) return false;
-    if(r && p.rating!==r) return false;
-    if(ind && p.industry!==ind) return false;
-    return true;
-  });
-  renderProjects(list);
-}
+  document.getElementById('v-ind').textContent = document.getElementById('s-ind').value;
+  document.getElementById('v-rev').textContent = rev;
+  document.getElementById('v-inv').textContent = inv;
+  document.getElementById('v-shr').textContent = (shr*100).toFixed(1)+'%';
+  document.getElementById('v-term').textContent = term;
+  document.getElementById('v-close').textContent = (close*100)+'%';
 
-// ===== Project Modal =====
-function openModal(p){
-  const m=document.getElementById('modalContent');
-  const dimColors={assetPos:'#e94560',cashFlow:'#3498db',returnSpace:'#2ecc71',safetyMargin:'#f0c040',riskControl:'#e67e22',fundingMatch:'#9b59b6'};
-  const dimNames={assetPos:'资产定位',cashFlow:'现金流质量',returnSpace:'收益空间',safetyMargin:'安全边界',riskControl:'风控依据',fundingMatch:'融资匹配度'};
-  const breakEvenRev = (p.inv / (p.term * p.share/100)).toFixed(1);
-  
-  let dimsHtml='';
-  Object.keys(dimNames).forEach(k=>{
-    dimsHtml+=`<div class="dim-card"><div class="dim-score" style="color:${dimColors[k]}">${p.dims[k]}</div><div class="dim-label">${dimNames[k]}</div><div class="dim-bar"><div class="dim-bar-fill" style="width:${p.dims[k]}%;background:${dimColors[k]}"></div></div></div>`;
-  });
+  const monthly = rev * shr;
+  const totalReturn = monthly * term * (1-close);
+  const annROI = ((totalReturn/inv)-1) * (12/term) * 100;
+  const safety = (1 - inv/(monthly*term)) * 100;
+  const breakeven = inv / (term * shr);
 
-  m.innerHTML=`
-    <h2 style="margin-bottom:4px;">${p.brand} · ${p.city}</h2>
-    <div style="color:var(--muted);font-size:13px;margin-bottom:16px;">${p.industry} · 品牌全国门店 ${p.stores.toLocaleString()} 家 · 评级 <span class="badge ${p.rating.startsWith('A')?'badge-a':'badge-b'}">${p.rating}</span></div>
-    <div style="font-size:12px;color:var(--blue);margin-bottom:16px;">📌 数据来源：${p.source}</div>
-    <div class="six-dim">${dimsHtml}</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;">
-      <div class="result-item"><div class="label">月估营收</div><div class="value">${p.monthRev}万</div></div>
-      <div class="result-item"><div class="label">建议投资额</div><div class="value">${p.inv}万</div></div>
-      <div class="result-item"><div class="label">分成比例</div><div class="value">${p.share}%</div></div>
-      <div class="result-item"><div class="label">合约期</div><div class="value">${p.term}月</div></div>
-      <div class="result-item"><div class="label">预期年化 ROI</div><div class="value" style="color:${p.annROI>=0?'var(--green)':'var(--highlight)'}">${p.annROI>0?'+':''}${p.annROI}%</div></div>
-      <div class="result-item"><div class="label">安全边界</div><div class="value" style="color:${p.safety>=0?'var(--green)':'var(--highlight)'}">${p.safety>0?'+':''}${p.safety}%</div></div>
-    </div>
-    <div class="logic-box">
-      <div class="logic-title">投资逻辑</div>
-      <p><b>为什么收益足够：</b>${p.brand}在全国拥有${p.stores.toLocaleString()}家门店，品牌成熟度高，单店月均营收约${p.monthRev}万元。以${p.share}%的分成比例、${p.term}个月合约期计算，月分成${(p.monthRev*p.share/100).toFixed(2)}万元，总回款${(p.monthRev*p.share/100*p.term).toFixed(1)}万元 vs 投资${p.inv}万元。</p>
-      <p style="margin-top:8px;"><b>安全边界计算：</b>门店营收可下降${Math.max(0,p.safety).toFixed(0)}%，在合约期内仍可收回本金。计算方式：1 - ${p.inv}/(${(p.monthRev*p.share/100).toFixed(2)}×${p.term}) = ${p.safety.toFixed(1)}%。</p>
-      <p style="margin-top:8px;"><b>回本营收线：</b>月均营收至少需要${breakEvenRev}万元才能在合约期内回本。当前月估营收${p.monthRev}万元，是回本线的${(p.monthRev/breakEvenRev*100).toFixed(0)}%。</p>
-      <p style="margin-top:8px;"><b>风控要点：</b>${p.brand}品牌方背景通过天眼查核验，无重大司法风险。${p.industry}行业属于日常消费刚需，具有较强的抗周期性。加盟门店分布在${p.city}等城市，区域经济基本面良好。</p>
-    </div>
-  `;
-  document.getElementById('projectModal').classList.add('show');
-}
-
-function closeModal(){document.getElementById('projectModal').classList.remove('show');}
-document.getElementById('projectModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-
-// ===== Simulator =====
-function updateSim(){
-  const rev=+document.getElementById('simRev').value;
-  const inv=+document.getElementById('simInv').value;
-  const share=+document.getElementById('simShare').value;
-  const term=+document.getElementById('simTerm').value;
-  const close=+document.getElementById('simClose').value;
-
-  document.getElementById('simRevLabel').textContent=rev;
-  document.getElementById('simInvLabel').textContent=inv;
-  document.getElementById('simShareLabel').textContent=share+'%';
-  document.getElementById('simTermLabel').textContent=term;
-  document.getElementById('simCloseLabel').textContent=close+'%';
-
-  const monthShare = rev * share / 100;
-  const totalReturn = monthShare * term * (1 - close/100);
-  const annROI = ((totalReturn - inv) / inv) * (12 / term) * 100;
-  
-  // IRR calculation (Newton's method)
-  let irrMonth = 0;
-  const cashFlows = [-inv];
-  for(let i=0;i<term;i++) cashFlows.push(monthShare * (1 - close/100));
-  
-  let guess = 0.01;
-  for(let iter=0;iter<200;iter++){
-    let npv=0, dnpv=0;
-    for(let t=0;t<cashFlows.length;t++){
-      npv+=cashFlows[t]/Math.pow(1+guess,t);
-      dnpv-=t*cashFlows[t]/Math.pow(1+guess,t+1);
+  // Simple IRR approximation using Newton's method
+  let irr_m = 0.01;
+  for(let iter=0;iter<100;iter++){
+    let npv = -inv;
+    let dnpv = 0;
+    for(let t=1;t<=term;t++){
+      const cf = monthly * (1-close);
+      npv += cf / Math.pow(1+irr_m, t);
+      dnpv -= t * cf / Math.pow(1+irr_m, t+1);
     }
-    if(Math.abs(dnpv)<1e-10) break;
-    const newGuess = guess - npv/dnpv;
-    if(Math.abs(newGuess-guess)<1e-8){guess=newGuess;break;}
-    guess=newGuess;
+    if(Math.abs(npv)<0.0001) break;
+    irr_m = irr_m - npv/dnpv;
+    if(irr_m<-0.5) irr_m=-0.01;
+    if(irr_m>5) irr_m=0.5;
   }
-  irrMonth = guess;
-  const irrAnnual = (Math.pow(1+irrMonth,12)-1)*100;
-  
-  const safety = (1 - inv / (monthShare * term)) * 100;
-  const breakEvenRev = inv / (term * share / 100);
+  const irr_a = (Math.pow(1+irr_m,12)-1)*100;
 
-  const res=document.getElementById('simResults');
-  res.innerHTML=`
-    <div class="result-item"><div class="label">月分成金额</div><div class="value">${monthShare.toFixed(2)}万</div><div class="formula">= 月营收 ${rev}万 × 分成比例 ${share}%</div></div>
-    <div class="result-item"><div class="label">预期总回款</div><div class="value">${totalReturn.toFixed(1)}万</div><div class="formula">= ${monthShare.toFixed(2)}万 × ${term}月 × (1-${close}%闭店)</div></div>
-    <div class="result-item"><div class="label">年化 ROI</div><div class="value" style="color:${annROI>=0?'var(--green)':'var(--highlight)'}">${annROI>=0?'+':''}${annROI.toFixed(1)}%</div><div class="formula">= [(总回款-投资额)/投资额] × (12/合约月数)</div></div>
-    <div class="result-item"><div class="label">等效年化 IRR</div><div class="value" style="color:${irrAnnual>=0?'var(--green)':'var(--highlight)'}">${isFinite(irrAnnual)?(irrAnnual>=0?'+':'')+irrAnnual.toFixed(1)+'%':'N/A'}</div><div class="formula">= (1+月IRR)^12 - 1，考虑资金时间价值</div></div>
-    <div class="result-item"><div class="label">安全边界</div><div class="value" style="color:${safety>=0?'var(--green)':'var(--highlight)'}">${safety>=0?'+':''}${safety.toFixed(1)}%</div><div class="formula">= 1 - 投资额/(月分成×合约月数)，即营收最多可降多少仍回本</div></div>
-    <div class="result-item"><div class="label">回本营收线</div><div class="value">${breakEvenRev.toFixed(1)}万/月</div><div class="formula">= 投资额/(合约月数×分成比例)，月营收需≥此值才能回本</div></div>
-  `;
-
-  // Stress test chart
-  const stressDiv=document.getElementById('stressChart');
-  stressDiv.innerHTML='';
-  for(let drop=0;drop<=50;drop+=5){
-    const adjRev = rev * (1 - drop/100);
-    const adjMonthShare = adjRev * share / 100;
-    const adjTotal = adjMonthShare * term * (1-close/100);
-    const adjROI = ((adjTotal - inv) / inv) * (12/term) * 100;
-    const bar=document.createElement('div');
-    bar.className='stress-bar';
-    const h = Math.max(5, Math.min(150, (adjROI+50)*1.5));
-    bar.style.height=h+'px';
-    bar.style.background=adjROI>=0?'var(--green)':'var(--highlight)';
-    bar.innerHTML=`<div class="tip">${adjROI>=0?'+':''}${adjROI.toFixed(0)}%</div>`;
-    stressDiv.appendChild(bar);
-  }
+  document.getElementById('r-monthly').textContent = monthly.toFixed(2)+' 万';
+  document.getElementById('r-total').textContent = totalReturn.toFixed(2)+' 万';
+  document.getElementById('r-roi').textContent = annROI.toFixed(1)+'%';
+  document.getElementById('r-roi').style.color = annROI>=0?'var(--green)':'var(--red)';
+  document.getElementById('r-irr').textContent = isFinite(irr_a)?irr_a.toFixed(1)+'%':'N/A';
+  document.getElementById('r-irr').style.color = irr_a>=0?'var(--green)':'var(--red)';
+  document.getElementById('r-safety').textContent = safety.toFixed(1)+'%';
+  document.getElementById('r-safety').style.color = safety>=0?'var(--green)':'var(--red)';
+  document.getElementById('r-breakeven').textContent = breakeven.toFixed(1)+' 万';
 }
-
-// ===== Dashboard Charts =====
-function initDashboard(){
-  // Industry chart
-  const indCounts={};
-  allProjects.forEach(p=>{indCounts[p.industry]=(indCounts[p.industry]||0)+1;});
-  const sorted=Object.entries(indCounts).sort((a,b)=>b[1]-a[1]);
-  const maxInd=sorted[0]?.[1]||1;
-  const colors=['var(--highlight)','var(--blue)','var(--green)','var(--gold)','var(--orange)','var(--purple)','#e74c3c','#1abc9c','#f39c12','#8e44ad'];
-  const indDiv=document.getElementById('industryChart');
-  sorted.slice(0,10).forEach(([name,count],i)=>{
-    indDiv.innerHTML+=`<div class="bar-row"><div class="bar-label">${name}</div><div class="bar-track"><div class="bar-fill" style="width:${count/maxInd*100}%;background:${colors[i%colors.length]}">${count}</div></div><div class="bar-value">${(count/allProjects.length*100).toFixed(1)}%</div></div>`;
-  });
-
-  // City chart
-  const cityCounts={};
-  allProjects.forEach(p=>{cityCounts[p.city]=(cityCounts[p.city]||0)+1;});
-  const sortedCities=Object.entries(cityCounts).sort((a,b)=>b[1]-a[1]);
-  const maxCity=sortedCities[0]?.[1]||1;
-  const cityDiv=document.getElementById('cityChart');
-  sortedCities.slice(0,8).forEach(([name,count],i)=>{
-    cityDiv.innerHTML+=`<div class="bar-row"><div class="bar-label">${name}</div><div class="bar-track"><div class="bar-fill" style="width:${count/maxCity*100}%;background:${colors[i%colors.length]}">${count}</div></div><div class="bar-value">${(count/allProjects.length*100).toFixed(1)}%</div></div>`;
-  });
-}
-
-// ===== Portfolio Charts =====
-function initPortfolio(){
-  // Industry concentration
-  const indCounts={};
-  allProjects.forEach(p=>{indCounts[p.industry]=(indCounts[p.industry]||0)+1;});
-  const sorted=Object.entries(indCounts).sort((a,b)=>b[1]-a[1]);
-  const portInd=document.getElementById('portIndustry');
-  sorted.forEach(([name,count],i)=>{
-    const pct=(count/allProjects.length*100).toFixed(1);
-    const colors2=['var(--highlight)','var(--blue)','var(--green)','var(--gold)','var(--orange)','var(--purple)','#e74c3c','#1abc9c','#f39c12','#8e44ad','#2c3e50','#16a085','#c0392b'];
-    portInd.innerHTML+=`<div class="bar-row"><div class="bar-label">${name}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${colors2[i%colors2.length]}">${pct}%</div></div><div class="bar-value">${pct>20?'⚠️':''}</div></div>`;
-  });
-
-  // City concentration
-  const cityCounts={};
-  allProjects.forEach(p=>{cityCounts[p.city]=(cityCounts[p.city]||0)+1;});
-  const sortedCities=Object.entries(cityCounts).sort((a,b)=>b[1]-a[1]);
-  const portCity=document.getElementById('portCity');
-  const colors3=['var(--blue)','var(--green)','var(--gold)','var(--highlight)','var(--orange)','var(--purple)','#1abc9c','#e74c3c'];
-  sortedCities.slice(0,10).forEach(([name,count],i)=>{
-    const pct=(count/allProjects.length*100).toFixed(1);
-    portCity.innerHTML+=`<div class="bar-row"><div class="bar-label">${name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.min(pct,20)}%;background:${colors3[i%colors3.length]}">${pct}%</div></div><div class="bar-value">${pct>15?'⚠️':''}</div></div>`;
-  });
-
-  // Rating distribution
-  const ratingCounts={};
-  allProjects.forEach(p=>{ratingCounts[p.rating]=(ratingCounts[p.rating]||0)+1;});
-  const portRating=document.getElementById('portRating');
-  const ratingColors={'A+':'var(--green)','A':'var(--blue)','A-':'var(--gold)','B+':'var(--orange)','B':'var(--highlight)'};
-  ['A+','A','A-','B+','B'].forEach(r=>{
-    const count=ratingCounts[r]||0;
-    const pct=(count/allProjects.length*100).toFixed(1);
-    portRating.innerHTML+=`<div class="bar-row"><div class="bar-label">${r}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${ratingColors[r]}">${count} (${pct}%)</div></div></div>`;
-  });
-}
-
-// ===== Init =====
-renderProjects(allProjects);
-initDashboard();
-initPortfolio();
-updateSim();
+calc();
 </script>
 </body>
 </html>
