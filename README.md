@@ -45,12 +45,12 @@
 
 ## 部署信息
 - **平台**: Cloudflare Pages
-- **状态**: ✅ 已部署
+- **状态**: ✅ 已部署 (v2.0)
 - **生产环境**: https://ai-cashflow-platform.pages.dev
-- **当前部署**: https://b1846e27.ai-cashflow-platform.pages.dev
+- **最新部署**: https://6250e476.ai-cashflow-platform.pages.dev
 - **GitHub 仓库**: https://github.com/mcrenee/ai
 - **技术栈**: 纯 HTML/CSS/JavaScript (无框架依赖)
-- **最后更新**: 2026-03-19
+- **最后更新**: 2026-03-20
 
 ## 本地开发
 ```bash
